@@ -82,6 +82,13 @@ export const Menu = () => {
             <p onClick={logout}>Logout</p>
           </li>
         </ul>
+
+        <span
+          className={`${styles.menuBackdrop} ${
+            isMenuOpen ? styles.menuBackdropVisible : ""
+          }`}
+          onClick={closeMenu}
+        ></span>
       </nav>
     )
   );

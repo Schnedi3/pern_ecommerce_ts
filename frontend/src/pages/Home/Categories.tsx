@@ -59,6 +59,13 @@ export const Categories = ({
           </li>
         ))}
       </ul>
+
+      <span
+        className={`${styles.modalBackdrop} ${
+          isModalOpen ? styles.modalBackdropVisible : ""
+        }`}
+        onClick={closeModal}
+      ></span>
     </article>
   );
 };

@@ -36,10 +36,8 @@
 
 .menuLink {
   position: relative;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--black-text);
-  text-transform: uppercase;
 }
 
 .menuLink:after {
@@ -136,13 +134,12 @@
     gap: 4rem;
     border-left: 0.05rem solid var(--gray-bg);
     background-color: var(--white-bg);
-    z-index: 2;
     clip-path: inset(0 0 0 100%);
-    z-index: 100;
+    z-index: 3;
     transition: 0.3s;
   }
 
-  .mobileMenu {
+  .menuLinksVisible {
     clip-path: inset(0 0 0 0);
   }
 
@@ -159,5 +156,21 @@
     padding-bottom: 0;
     border-right: 0.15rem solid var(--accent);
     border-bottom: 0;
+  }
+
+  .menuBackdrop {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.01);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 2;
+  }
+
+  .menuBackdropVisible {
+    opacity: 1;
+    visibility: visible;
   }
 }

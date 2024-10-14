@@ -1,7 +1,7 @@
 /* CATEGORIES */
 .categories {
   position: relative;
-  justify-self: end;
+  z-index: 1;
 }
 
 .toggleModal {
@@ -60,6 +60,22 @@
 
 .active {
   color: var(--accent);
+}
+
+.modalBackdrop {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.01);
+  opacity: 0;
+  visibility: hidden;
+  z-index: -1;
+}
+
+.modalBackdropVisible {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* HOVER */
