@@ -9,17 +9,24 @@ export const validateToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res
-      .status(401)
-      .json({ success: false, message: "No token, authorization denied" });
-  }
+  const token: string = req.cookies.accessToken;
 
   try {
-    const validate = jwt.verify(token, JWT_SECRET);
-    req.user = validate as IUser;
-    next();
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token, authorization denied" });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
+      if (err) {
+        return res
+          .status(403)
+          .json({ success: false, message: "verification failed" });
+      }
+      req.user = decodedToken as IUser;
+      next();
+    });
   } catch (error: any) {
     return res.status(403).json({ success: false, message: error.message });
   }

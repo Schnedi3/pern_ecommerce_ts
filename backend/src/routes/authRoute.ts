@@ -8,6 +8,7 @@ import {
   loginUser,
   registerUser,
   resetPassword,
+  tokenController,
 } from "../controllers/authController";
 
 const router = Router();
@@ -20,5 +21,8 @@ router.post("/google", loginGoogle);
 router.post("/login", validateSchema(loginSchema), loginUser);
 router.post("/register", validateSchema(registerSchema), registerUser);
 router.put("/reset-password", validateSchema(loginSchema), resetPassword);
+
+// both
+router.get("/refresh-token", tokenController);
 
 export default router;
