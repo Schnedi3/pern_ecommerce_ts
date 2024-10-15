@@ -12,3 +12,6 @@ export const PG_PORT = process.env.PG_PORT;
 export const PG_USER = process.env.PG_USER;
 
 export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+
+export const ACCESS_TOKEN = "accessToken";
+export const REFRESH_TOKEN = "refreshToken";
