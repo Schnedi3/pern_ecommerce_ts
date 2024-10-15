@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import axios from "axios";
+import jwt from "jsonwebtoken";
 
-import { generateToken } from "../libs/generateToken";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../libs/generateToken";
 import { createCartForUser } from "../database/cartDB";
 import {
   createGoogleUserDB,
@@ -10,6 +14,7 @@ import {
   registerUserDB,
   resetPasswordDB,
 } from "../database/authDB";
+import { ACCESS_TOKEN, JWT_SECRET, REFRESH_TOKEN } from "../config/config";
 
 export const loginAdmin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -30,14 +35,15 @@ export const loginAdmin = async (req: Request, res: Response) => {
         .json({ success: false, message: "Invalid password" });
     }
 
-    const token = generateToken(result.id);
-    res.cookie("token", token);
+    const accessToken = generateAccessToken(result);
+    const refreshToken = generateRefreshToken(result);
+    setAccessCookie(res, accessToken);
+    setRefreshCookie(res, refreshToken);
 
     res.status(200).json({
       success: true,
       message: "Logged in succesfully",
       result,
-      token,
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -59,15 +65,16 @@ export const loginGoogle = async (req: Request, res: Response) => {
     const userId = result.id;
     const cart = await createCartForUser(userId);
 
-    const token = generateToken(result.id);
-    res.cookie("token", token);
+    const accessToken = generateAccessToken(result);
+    const refreshToken = generateRefreshToken(result);
+    setAccessCookie(res, accessToken);
+    setRefreshCookie(res, refreshToken);
 
     res.status(200).json({
       success: true,
       message: "Logged in succesfully",
       result,
       cart,
-      token,
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -87,14 +94,15 @@ export const loginUser = async (req: Request, res: Response) => {
         .json({ success: false, message: "Invalid password" });
     }
 
-    const token = generateToken(result.id);
-    res.cookie("token", token);
+    const accessToken = generateAccessToken(result);
+    const refreshToken = generateRefreshToken(result);
+    setAccessCookie(res, accessToken);
+    setRefreshCookie(res, refreshToken);
 
     res.status(200).json({
       success: true,
       message: "Logged in succesfully",
       result,
-      token,
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -114,17 +122,16 @@ export const registerUser = async (req: Request, res: Response) => {
     const userId = result.id;
     const cart = await createCartForUser(userId);
 
-    // generate token
-    const token = generateToken(result.id);
-    // Set token as a cookie
-    res.cookie("token", token);
+    const accessToken = generateAccessToken(result);
+    const refreshToken = generateRefreshToken(result);
+    setAccessCookie(res, accessToken);
+    setRefreshCookie(res, refreshToken);
 
     res.status(200).json({
       success: true,
       message: "Registered succesfully",
       result,
       cart,
-      token,
     });
   } catch (error: any) {
     if (error.code === "23505") {
@@ -149,4 +156,44 @@ export const resetPassword = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
+};
+
+export const refreshToken = (req: Request, res: Response) => {
+  const { refreshToken } = req.cookies;
+
+  try {
+    jwt.verify(refreshToken, JWT_SECRET, (err: Error | null, result: any) => {
+      if (err) {
+        return res
+          .status(401)
+          .json({ success: false, message: "verification failed" });
+      }
+
+      const accessToken = generateAccessToken(result);
+      setAccessCookie(res, accessToken);
+
+      res.status(200).json({
+        success: true,
+        message: "Token refreshed succesfully",
+      });
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const setAccessCookie = (res: Response, accessToken: string) => {
+  res.cookie(ACCESS_TOKEN, accessToken, {
+    httpOnly: true,
+    secure: true,
+    path: "/",
+  });
+};
+
+const setRefreshCookie = (res: Response, refreshToken: string) => {
+  res.cookie(REFRESH_TOKEN, refreshToken, {
+    httpOnly: true,
+    secure: true,
+    path: "/",
+  });
 };

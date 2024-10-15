@@ -6,7 +6,6 @@ import {
   useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { useGoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 
@@ -35,7 +34,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     setIsAuthenticated(true);
     getCart();
     toast.success(response.data.message);
-    Cookies.set("token", response.data.token);
     localStorage.setItem("user", JSON.stringify(response.data.result));
     navigate("/");
   };
@@ -100,7 +98,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   };
 
   const logout = () => {
-    Cookies.remove("token");
     localStorage.removeItem("user");
     setIsAuthenticated(false);
     setUser(null);
@@ -129,10 +126,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   };
 
   const checkAuth = useCallback(() => {
-    const token = Cookies.get("token");
     const savedUser = localStorage.getItem("user");
 
-    if (token && savedUser) {
+    if (savedUser) {
       getCart();
       setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
