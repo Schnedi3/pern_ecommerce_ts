@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
 
-import { useAuthContext } from "../../context/useAuthContext";
+import { useAuthStore } from "../../store/authStore";
+import { loginGoogleRequest, loginRequest } from "../../Routes";
 import { loginSchema } from "../../schemas/schemas";
-import { ILogin } from "../../types/types";
-
+import { IUser } from "../../types/types";
 import {
   Button,
   iconEyeClosed,
@@ -18,24 +20,55 @@ import styles from "./auth.module.css";
 
 export const Login = () => {
   const [visible, setIsVisible] = useState<boolean>(false);
-  const { googleLogin, login } = useAuthContext();
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
-  } = useForm<ILogin>({
+  } = useForm<IUser>({
     resolver: zodResolver(loginSchema),
   });
+  const { authData } = useAuthStore();
 
-  const onSubmit = (data: ILogin) => {
-    login(data);
-    reset();
+  const loginGoogle = useGoogleLogin({
+    onSuccess: (codeResponse) => googleLogin(codeResponse.access_token),
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  const googleLogin = async (accessToken: string) => {
+    try {
+      const { data } = await loginGoogleRequest(accessToken);
+
+      if (!data.success) {
+        console.log(data.message);
+      }
+      authData(data);
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
+    }
+  };
+
+  const onSubmit = (data: IUser) => {
+    loginUser(data);
+  };
+
+  const loginUser = async (user: IUser) => {
+    try {
+      const { data } = await loginRequest(user);
+
+      if (!data.success) {
+        console.log(data.message);
+      }
+      authData(data);
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
+    }
   };
 
   return (
     <section className={styles.auth}>
-      <button className={styles.gbutton} onClick={() => googleLogin()}>
+      <button className={styles.gbutton} onClick={() => loginGoogle()}>
         <img className={styles.googleIcon} src={iconGoogle} />
         <p className={styles.gbuttonText}>Login with Google</p>
       </button>
