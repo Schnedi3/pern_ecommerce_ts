@@ -64,7 +64,7 @@ import { NewProduct } from "./pages/NewProduct/NewProduct";
 import { NotFound } from "./pages/NotFound/NotFound";
 import { Orders } from "./pages/Orders/Orders";
 import { Products } from "./pages/Products/Products";
-import { ProtectedRoute } from "./pages/ProtectedRoute/ProtectedRoute";
+import { ProtectedRoute } from "./pages/ProtectedRoute";
 import { Users } from "./pages/users/Users";
 
 export { Login, NewProduct, NotFound, Orders, Products, ProtectedRoute, Users };

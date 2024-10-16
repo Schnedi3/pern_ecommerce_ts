@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-import { useAuthContext } from "../../context/useAuthContext";
+import { useAuthStore } from "../../store/authStore";
 import { ILogin } from "../../types/types";
-import { iconEyeClosed, iconEyeOpen, Title } from "../../Routes";
+import { adminRequest, iconEyeClosed, iconEyeOpen, Title } from "../../Routes";
 import styles from "./login.module.css";
 
 export const Login = () => {
@@ -14,11 +14,25 @@ export const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<ILogin>();
-  const { isAuthenticated, login } = useAuthContext();
+  const { isAuthenticated, authData } = useAuthStore();
   const navigate = useNavigate();
 
   const onSubmit = (data: ILogin) => {
     login(data);
+  };
+
+  const login = async (user: ILogin) => {
+    try {
+      const { data } = await adminRequest(user);
+
+      if (!data.success) {
+        console.log(data.message);
+      }
+
+      authData(data);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
+    }
   };
 
   useEffect(() => {

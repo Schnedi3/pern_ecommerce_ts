@@ -1,9 +1,16 @@
-export interface AuthContextType {
-  user: IUser | null;
+// auth
+export interface IAuthStore {
   isAuthenticated: boolean;
-  loading:boolean;
-  login: (user: ILogin) => void;
-  logout: () => void;
+  user: ILogin | null;
+  authData: (data: IAuthResponse) => void;
+  logoutAuth: () => void;
+}
+
+export interface IAuthResponse {
+  success: boolean;
+  message: string;
+  result: IUser;
+  token: string;
 }
 
 export interface ILogin {
@@ -11,6 +18,15 @@ export interface ILogin {
   password: string;
 }
 
+export interface IUser {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
+// order
 export interface IOrder {
   city: string;
   door: string;
@@ -43,6 +59,7 @@ interface IOrderProduct {
   subcategory: string;
 }
 
+// product
 export interface IProduct {
   id: number;
   title: string;
@@ -52,12 +69,4 @@ export interface IProduct {
   price: number;
   sizes: string[];
   images: string[];
-}
-
-export interface IUser {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  role: string;
 }
