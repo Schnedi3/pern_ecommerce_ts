@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 
-import { useAuthContext } from "../../context/useAuthContext";
+import { useAuthStore } from "../../store/authStore";
 import { useShopContext } from "../../context/useShopContext";
 import {
   addToCartRequest,
@@ -23,7 +23,7 @@ export const Detail = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const { id } = useParams<string>();
   const { cart, setCart, getCart } = useShopContext();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const getProduct = async () => {

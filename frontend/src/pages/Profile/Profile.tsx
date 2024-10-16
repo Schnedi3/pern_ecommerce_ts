@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import { useAuthContext } from "../../context/useAuthContext";
+import { useAuthStore } from "../../store/authStore";
 import { useShopContext } from "../../context/useShopContext";
 import {
   iconAddress,
@@ -17,7 +17,6 @@ import { IAddress } from "../../types/types";
 import styles from "./profile.module.css";
 
 export const Profile = () => {
-  const { user, setUser } = useAuthContext();
   const {
     getAddress,
     addressList,
@@ -25,6 +24,7 @@ export const Profile = () => {
     isModalAddress,
     setIsModalAddress,
   } = useShopContext();
+  const { user, authData } = useAuthStore();
 
   useEffect(() => {
     getAddress();
@@ -45,7 +45,7 @@ export const Profile = () => {
 
         if (response.data.success) {
           toast.success(response.data.message);
-          setUser(response.data.result);
+          authData(response.data.result);
           localStorage.setItem("user", JSON.stringify(response.data.result));
           setIsEditUsername(false);
         } else {

@@ -1,29 +1,45 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-import { useAuthContext } from "../../context/useAuthContext";
+import { resetPasswordRequest } from "../../Routes";
 import { loginSchema } from "../../schemas/schemas";
-import { ILogin } from "../../types/types";
-
+import { IUser } from "../../types/types";
 import { Button, iconEyeClosed, iconEyeOpen, Title } from "../../Routes";
 import styles from "./auth.module.css";
 
 export const ResetPassword = () => {
   const [visible, setIsVisible] = useState<boolean>(false);
-  const { resetPassword } = useAuthContext();
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ILogin>({
+  } = useForm<IUser>({
     resolver: zodResolver(loginSchema),
   });
+  const navigate = useNavigate();
 
-  const onSubmit = (data: ILogin) => {
+  const onSubmit = (data: IUser) => {
     resetPassword(data);
     reset();
+  };
+
+  const resetPassword = async (user: IUser) => {
+    try {
+      const { data } = await resetPasswordRequest(user);
+
+      if (!data.success) {
+        console.log(data.message);
+      }
+
+      toast.success(data.message);
+      navigate("/login");
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
+    }
   };
 
   return (
