@@ -51,12 +51,6 @@ export interface IAddress {
   zip_code: string;
 }
 
-export interface ICategoriesProps {
-  selectedCategory: string;
-  setSelectedCategory: (selectedCategory: string) => void;
-  products: IProduct[];
-}
-
 export interface IContact {
   name: string;
   email: string;
@@ -80,10 +74,7 @@ interface IOrderProduct {
   title: string;
 }
 
-export interface IProductCardProps {
-  filteredProducts: IProduct[];
-}
-
+// product
 export interface IProduct {
   id: number;
   title: string;
@@ -94,9 +85,4 @@ export interface IProduct {
   sizes: string[];
   images: string[];
   quantity: number;
-}
-
-export interface ISearchProps {
-  inputValue: string;
-  setInputValue: (inputValue: string) => void;
 }

@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getProductsRequest } from "../../Routes";
-import { IProduct } from "../../types/types";
 import { ProductCard } from "./ProductCard";
 import { Search } from "./Search";
 import { Categories } from "./Categories";
 import { HomeSkeleton } from "../../skeletons/HomeSkeleton";
+import { IProduct } from "../../types/types";
 import styles from "./home.module.css";
 import "../globals.css";
 
@@ -18,27 +17,23 @@ export const Home = () => {
   const [selectedCategory, setSelectedCategory] =
     useState<string>(defaultCategory);
 
-  const getProducts = async () => {
+  const getProducts = useCallback(async () => {
     try {
-      const response = await getProductsRequest();
+      const { data } = await getProductsRequest();
 
-      if (response.data.success) {
-        setProducts(response.data.result);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      setProducts(data.result);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
-  };
+  }, [setProducts]);
 
   useEffect(() => {
     getProducts();
-  }, []);
+  }, [getProducts]);
 
   const filteredProducts = useMemo(() => {
     let filtered = products;

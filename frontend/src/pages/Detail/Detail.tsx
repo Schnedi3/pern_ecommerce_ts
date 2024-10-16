@@ -29,20 +29,18 @@ export const Detail = () => {
     const getProduct = async () => {
       try {
         if (id) {
-          const response = await getProductRequest(parseInt(id));
+          const { data } = await getProductRequest(parseInt(id));
 
-          if (response.data.success) {
-            setProduct(response.data.result);
-          } else {
-            toast.error(response.data.message);
+          if (!data.success) {
+            console.log(data.message);
           }
+
+          setProduct(data.result);
         }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.log(error.message);
-        } else {
-          console.log("An unexpected error occurred");
-        }
+      } catch (error) {
+        console.log(
+          error instanceof Error ? error.message : "Unexpected error"
+        );
       }
     };
 

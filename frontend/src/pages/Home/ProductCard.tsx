@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
 
-import { useShopContext } from "../../context/useShopContext";
+import { useCartStore } from "../../store/cartStore";
 import { formatCurrency } from "../../helpers/formatCurrency";
-import { IProductCardProps } from "../../types/types";
+import { IProduct } from "../../types/types";
 import { imagesURL } from "../config";
 import styles from "./card.module.css";
 
+interface IProductCardProps {
+  filteredProducts: IProduct[];
+}
+
 export const ProductCard = ({ filteredProducts }: IProductCardProps) => {
-  const { cart } = useShopContext();
+  const { cart } = useCartStore();
 
   return (
     <section className={styles.cards}>

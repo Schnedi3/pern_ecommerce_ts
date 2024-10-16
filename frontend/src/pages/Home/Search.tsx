@@ -1,6 +1,10 @@
-import { ISearchProps } from "../../types/types";
 import { iconClose, iconSearch } from "../../Routes";
 import styles from "./search.module.css";
+
+interface ISearchProps {
+  inputValue: string;
+  setInputValue: (inputValue: string) => void;
+}
 
 export const Search = ({ inputValue, setInputValue }: ISearchProps) => {
   return (
