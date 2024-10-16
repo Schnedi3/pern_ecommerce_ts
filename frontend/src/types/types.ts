@@ -22,6 +22,16 @@ export interface IUser {
 }
 
 // cart
+export interface ICartStore {
+  cart: CartItem[];
+  getCartStore: () => void;
+  addToCartStore: (product: CartItem) => void;
+  deleteFromCartStore: (id: number) => void;
+  updateProductQuantityStore: (id: number, updatedItem: CartItem) => void;
+  itemsInCart: number;
+  totalAmount: number;
+}
+
 export interface CartItem extends IProduct {
   product_id: number;
   quantity: number;
@@ -89,19 +99,4 @@ export interface IProduct {
 export interface ISearchProps {
   inputValue: string;
   setInputValue: (inputValue: string) => void;
-}
-
-export interface ShopContextType {
-  // address
-  getAddress: () => void;
-  addressList: IAddress[];
-  setAddressList: (addressList: IAddress[]) => void;
-  isModalAddress: boolean;
-  setIsModalAddress: (isModalAddress: boolean) => void;
-  // cart
-  cart: CartItem[];
-  setCart: (cart: CartItem[]) => void;
-  getCart: () => void;
-  itemsInCart: number;
-  totalAmount: number;
 }

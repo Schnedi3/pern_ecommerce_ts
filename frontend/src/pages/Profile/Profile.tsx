@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import { useAuthContext } from "../../context/useAuthContext";
-import { useShopContext } from "../../context/useShopContext";
+import { useAuthStore } from "../../store/authStore";
+import { useCartStore } from "../../store/cartStore";
 import {
+  deleteAddressRequest,
+  updateUsernameRequest,
+  AddressModal,
+  Title,
   iconAddress,
   iconDelete,
   iconEdit,
-  AddressModal,
-  deleteAddressRequest,
-  updateUsernameRequest,
-  Title,
 } from "../../Routes";
 import { AddressUpdate } from "./AddressUpdate";
 import { IAddress } from "../../types/types";
@@ -25,7 +25,6 @@ export const Profile = () => {
     isModalAddress,
     setIsModalAddress,
   } = useShopContext();
-
   useEffect(() => {
     getAddress();
   }, [getAddress]);
@@ -33,34 +32,13 @@ export const Profile = () => {
   const [isEditUsername, setIsEditUsername] = useState<boolean>(false);
   const [updatedUsername, setUpdatedUsername] = useState<string>("");
 
-  const handleUpdateUser = async (
-    e: React.FormEvent<HTMLFormElement>,
-    id: number
-  ) => {
-    e.preventDefault();
-
-    try {
-      if (updatedUsername.trim() !== "") {
-        const response = await updateUsernameRequest(updatedUsername, id);
-
-        if (response.data.success) {
-          toast.success(response.data.message);
-          setUser(response.data.result);
-          localStorage.setItem("user", JSON.stringify(response.data.result));
-          setIsEditUsername(false);
-        } else {
-          toast.error(response.data.message);
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const [isEditAddress, setIsEditAddress] = useState<boolean>(false);
   const [addressData, setAddressData] = useState<IAddress | undefined>(
     undefined
   );
+
+  const { user, authData } = useAuthStore();
+
   const handleUpdateAddress = (address: IAddress) => {
     setIsEditAddress(true);
     setAddressData(address);
@@ -81,7 +59,29 @@ export const Profile = () => {
         console.log(error.message);
       } else {
         console.log("An unexpected error occurred");
+    }
+  };
+
+  const handleUpdateUser = async (
+    e: React.FormEvent<HTMLFormElement>,
+    id: number
+  ) => {
+    e.preventDefault();
+
+    try {
+      if (updatedUsername.trim() !== "") {
+        const { data } = await updateUsernameRequest(updatedUsername, id);
+
+        if (!data.success) {
+          console.log(data.message);
+        }
+
+        authData(data.result);
+        toast.success(data.message);
+        setIsEditUsername(false);
       }
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 

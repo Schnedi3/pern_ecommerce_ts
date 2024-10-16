@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { useNavigate } from "react-router-dom";
 
-import { useShopContext } from "../../context/useShopContext";
+import { useCartStore } from "../../store/cartStore";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import {
   createCheckoutSessionRequest,
@@ -20,12 +20,12 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 export const OrderSummary = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<number>(0);
-  const { getCart } = useShopContext();
+  const [isAddAddress, setIsAddAddress] = useState<boolean>(false);
+  const { cart, getCartStore, totalAmount } =
+    useCartStore();
   const navigate = useNavigate();
 
   const {
-    cart,
-    totalAmount,
     getAddress,
     addressList,
     isModalAddress,
@@ -40,46 +40,42 @@ export const OrderSummary = () => {
     try {
       const stripe = await stripePromise;
 
-      const response = await createCheckoutSessionRequest(
+      const { data } = await createCheckoutSessionRequest(
         cart,
         shippingAddress,
         totalAmount,
         paymentMethod
       );
 
-      if (response.data.success) {
-        stripe &&
-          (await stripe.redirectToCheckout({ sessionId: response.data.id }));
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
+      }
+
+      if (stripe) {
+        await stripe.redirectToCheckout({ sessionId: data.id });
       }
     } catch (error) {
-      console.error("Error creating checkout session:", error);
-      toast.error("Failed to redirect to Stripe Checkout");
+      console.error(`Error creating checkout session: ${error}`);
     }
   };
 
   const handleCodCheckout = async () => {
     try {
-      const response = await addOrderRequest(
+      const { data } = await addOrderRequest(
         shippingAddress,
         totalAmount,
         paymentMethod
       );
 
-      if (response.data.success) {
-        getCart();
-        navigate("/success");
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        toast.error(data.message);
         navigate("/cart");
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      getCartStore();
+      navigate("/success");
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
@@ -169,7 +165,7 @@ export const OrderSummary = () => {
 
       <button
         className={styles.addAddress}
-        onClick={() => setIsModalAddress(true)}
+        onClick={() => setIsAddAddress(true)}
       >
         <img
           className={styles.addAddressIcon}

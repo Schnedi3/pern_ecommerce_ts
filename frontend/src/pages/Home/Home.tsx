@@ -3,12 +3,12 @@ import { toast } from "react-toastify";
 
 import { getProductsRequest } from "../../Routes";
 import { IProduct } from "../../types/types";
+import { ProductCard } from "./ProductCard";
 import { Search } from "./Search";
 import { Categories } from "./Categories";
 import { HomeSkeleton } from "../../skeletons/HomeSkeleton";
 import styles from "./home.module.css";
 import "../globals.css";
-import { ProductCard } from "./ProductCard";
 
 export const defaultCategory: string = "All";
 

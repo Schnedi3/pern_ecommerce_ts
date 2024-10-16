@@ -15,7 +15,6 @@ interface IAddressProps {
 
 export const AddressModal = ({ getAddress }: IAddressProps) => {
   const { isModalAddress, setIsModalAddress } = useShopContext();
-
   const {
     register,
     handleSubmit,
@@ -28,7 +27,6 @@ export const AddressModal = ({ getAddress }: IAddressProps) => {
   const onSubmit = async (data: IAddress) => {
     try {
       const response = await addAddressRequest(data);
-
       if (response.data.success) {
         toast.success(response.data.message);
         getAddress();
@@ -41,7 +39,6 @@ export const AddressModal = ({ getAddress }: IAddressProps) => {
         console.log(error.message);
       } else {
         console.log("An unexpected error occurred");
-      }
     }
 
     reset();

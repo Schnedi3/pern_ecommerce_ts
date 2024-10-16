@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 
-import { useAuthContext } from "../../context/useAuthContext";
-import { useShopContext } from "../../context/useShopContext";
+import { useAuthStore } from "../../store/authStore";
+import { useCartStore } from "../../store/cartStore";
 import {
   addToCartRequest,
   getProductRequest,
@@ -22,8 +22,8 @@ export const Detail = () => {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [currentImage, setCurrentImage] = useState(0);
   const { id } = useParams<string>();
-  const { cart, setCart, getCart } = useShopContext();
-  const { isAuthenticated } = useAuthContext();
+  const { cart, getCartStore, addToCartStore } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const getProduct = async () => {
@@ -66,26 +66,21 @@ export const Detail = () => {
     if (!isAuthenticated) return toast.error("Login first");
 
     try {
-      const response = await addToCartRequest(
+      const { data } = await addToCartRequest(
         product.id,
         quantity,
         selectedSize
       );
 
-      if (response.data.success) {
-        const newItem = response.data.result;
-        setCart([...cart, newItem]);
-        getCart();
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      addToCartStore(data.result);
+      getCartStore();
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 

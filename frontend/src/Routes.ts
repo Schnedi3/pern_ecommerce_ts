@@ -10,7 +10,7 @@ import { resetPasswordRequest } from "./api/auth";
 import { addToCartRequest } from "./api/cart";
 import { deleteFromCartRequest } from "./api/cart";
 import { getCartRequest } from "./api/cart";
-import { updateCartRequest } from "./api/cart";
+import { updateProductQuantityRequest } from "./api/cart";
 import { addOrderRequest } from "./api/order";
 import { addStripeOrderRequest } from "./api/order";
 import { getUserOrdersRequest } from "./api/order";
@@ -32,7 +32,7 @@ export {
   addToCartRequest,
   deleteFromCartRequest,
   getCartRequest,
-  updateCartRequest,
+  updateProductQuantityRequest,
   addOrderRequest,
   addStripeOrderRequest,
   getUserOrdersRequest,

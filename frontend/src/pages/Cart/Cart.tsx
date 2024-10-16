@@ -1,68 +1,72 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { useAuthContext } from "../../context/useAuthContext";
-import { useShopContext } from "../../context/useShopContext";
+import { useCartStore } from "../../store/cartStore";
+import { useAuthStore } from "../../store/authStore";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import {
   deleteFromCartRequest,
   iconCart,
   iconDelete,
   Title,
-  updateCartRequest,
+  updateProductQuantityRequest,
 } from "../../Routes";
 import { imagesURL } from "../config";
 import styles from "./cart.module.css";
 
 export const Cart = () => {
-  const { cart, setCart, getCart, totalAmount } = useShopContext();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated } = useAuthStore();
+  const {
+    cart,
+    getCartStore,
+    deleteFromCartStore,
+    updateProductQuantityStore,
+    totalAmount,
+  } = useCartStore();
   const navigate = useNavigate();
 
-  const updateQuantity = async (
+  useEffect(() => {
+    getCartStore();
+  }, [getCartStore]);
+
+  const deleteFromCart = async (productId: number, size: string) => {
+    try {
+      const { data } = await deleteFromCartRequest(productId, size);
+
+      if (!data.success) {
+        console.log(data.message);
+      }
+
+      deleteFromCartStore(productId);
+      getCartStore();
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
+    }
+  };
+
+  const updateProductQuantity = async (
     productId: number,
     quantity: number,
     size: string
   ) => {
     try {
-      const response = await updateCartRequest(productId, quantity, size);
+      const { data } = await updateProductQuantityRequest(
+        productId,
+        quantity,
+        size
+      );
 
-      if (response.data.success) {
-        const updateItem = response.data.result;
-        setCart(
-          cart.map((item) => (item.id === productId ? updateItem : item))
-        );
-        getCart();
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
-  };
 
-  const deleteProduct = async (product_id: number, size: string) => {
-    try {
-      const response = await deleteFromCartRequest(product_id, size);
-
-      if (response.data.success) {
-        setCart(cart.filter((item) => item.id !== product_id));
-        getCart();
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+      updateProductQuantityStore(productId, data.result);
+      getCartStore();
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
@@ -112,7 +116,7 @@ export const Cart = () => {
               min={1}
               defaultValue={item.quantity}
               onChange={(e) =>
-                updateQuantity(
+                updateProductQuantity(
                   item.product_id,
                   Number(e.target.value),
                   item.size
@@ -125,7 +129,7 @@ export const Cart = () => {
               className={styles.delete}
               src={iconDelete}
               alt="delete product"
-              onClick={() => deleteProduct(item.product_id, item.size)}
+              onClick={() => deleteFromCart(item.product_id, item.size)}
             />
           </div>
         ))}
