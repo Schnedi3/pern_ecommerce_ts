@@ -1,15 +1,15 @@
 import { Outlet } from "react-router-dom";
 
+import { useAuthStore } from "../store/authStore";
 import { Menu } from "../Routes";
-import { AuthProvider } from "../context/AuthContext";
 
 export const RootLayout = () => {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <section>
-      <AuthProvider>
-        <Menu />
-        <Outlet />
-      </AuthProvider>
+      {isAuthenticated && <Menu />}
+      <Outlet />
     </section>
   );
 };
