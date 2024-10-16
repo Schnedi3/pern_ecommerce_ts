@@ -19,19 +19,15 @@ export const Orders = () => {
 
   const getOrders = async () => {
     try {
-      const response = await getOrdersRequest();
+      const { data } = await getOrdersRequest();
 
-      if (response.data.success) {
-        setOrders(response.data.result);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      setOrders(data.result);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
@@ -45,38 +41,30 @@ export const Orders = () => {
 
   const updateOrder = async (id: number, status: string) => {
     try {
-      const response = await updateOrderRequest(id, status);
+      const { data } = await updateOrderRequest(id, status);
 
-      if (response.data.success) {
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
   const deleteOrder = async (id: number) => {
     try {
-      const response = await deleteOrderRequest(id);
+      const { data } = await deleteOrderRequest(id);
 
-      if (response.data.success) {
-        setOrders(orders.filter((order) => order.order_id !== id));
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      setOrders(orders.filter((order) => order.order_id !== id));
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 

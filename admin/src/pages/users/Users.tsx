@@ -15,38 +15,30 @@ export const Users = () => {
 
   const getUsers = async () => {
     try {
-      const response = await getUsersRequest();
+      const { data } = await getUsersRequest();
 
-      if (response.data.success) {
-        setUsers(response.data.result);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      setUsers(data.result);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
   const deleteUser = async (id: number) => {
     try {
-      const response = await deleteUserRequest(id);
+      const { data } = await deleteUserRequest(id);
 
-      if (response.data.success) {
-        setUsers(users.filter((user) => user.id !== id));
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      setUsers(users.filter((user) => user.id !== id));
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
