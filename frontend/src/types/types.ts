@@ -1,15 +1,21 @@
-export interface AuthContextType {
-  user: ILogin | IRegister | null;
-  setUser: (user: ILogin | IRegister | null) => void;
-  googleLogin: () => void;
-  login: (user: ILogin) => void;
-  signup: (user: IRegister) => void;
-  logout: () => void;
-  resetPassword: (user: ILogin) => void;
+// auth
+export interface IAuthStore {
   isAuthenticated: boolean;
-  setIsAuthenticated: (isAuthenticated: boolean) => void;
+  user: IUser | null;
+  authData: (data: IUser) => void;
+  logoutAuth: () => void;
 }
 
+export interface IUser {
+  id: number;
+  username: string;
+  email: string;
+  password: string | null;
+  role: string;
+  google_id: string | null;
+}
+
+// cart
 export interface CartItem extends IProduct {
   product_id: number;
   quantity: number;
@@ -39,14 +45,6 @@ export interface IContact {
   name: string;
   email: string;
   message: string;
-}
-
-export interface ILogin {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  role: string;
 }
 
 export interface IOrder {
@@ -80,14 +78,6 @@ export interface IProduct {
   sizes: string[];
   images: string[];
   quantity: number;
-}
-
-export interface IRegister {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  role: string;
 }
 
 export interface ISearchProps {

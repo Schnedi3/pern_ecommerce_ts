@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { useAuthContext } from "../../context/useAuthContext";
+import { useAuthStore } from "../../store/authStore";
 import { useShopContext } from "../../context/useShopContext";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import {
@@ -16,7 +16,7 @@ import styles from "./cart.module.css";
 
 export const Cart = () => {
   const { cart, setCart, getCart, totalAmount } = useShopContext();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
 
   const updateQuantity = async (

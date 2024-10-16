@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import { useAuthContext } from "../../context/useAuthContext";
+import { useAuthStore } from "../../store/authStore";
 import { iconLogin } from "../../Routes";
 import styles from "./modal.module.css";
 
 export const Modal = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { logout } = useAuthContext();
+  const { logoutAuth } = useAuthStore();
+  const navigate = useNavigate();
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const closeModal = () => setIsModalOpen(false);
@@ -28,6 +30,11 @@ export const Modal = () => {
       document.body.style.overflow = "unset";
     };
   }, [isModalOpen]);
+
+  const logout = () => {
+    logoutAuth();
+    navigate("/");
+  };
 
   return (
     <section>
