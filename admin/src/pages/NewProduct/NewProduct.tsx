@@ -50,26 +50,22 @@ export const NewProduct = () => {
       sizes.forEach((size) => formData.append("sizes", size));
       images.forEach((image) => formData.append("images", image));
 
-      const response = await addProductRequest(formData);
+      const { data } = await addProductRequest(formData);
 
-      if (response.data.success) {
-        toast.success(response.data.message);
-        setTitle("");
-        setDescription("");
-        setCategory("Men");
-        setSubcategory("Top");
-        setPrice("");
-        setSizes([]);
-        setImages([]);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      toast.success(data.message);
+      setTitle("");
+      setDescription("");
+      setCategory("Men");
+      setSubcategory("Top");
+      setPrice("");
+      setSizes([]);
+      setImages([]);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 

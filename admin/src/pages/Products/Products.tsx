@@ -18,38 +18,30 @@ export const Products = () => {
 
   const getProducts = async () => {
     try {
-      const response = await getProductsRequest();
+      const { data } = await getProductsRequest();
 
-      if (response.data.success) {
-        setProducts(response.data.result);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      setProducts(data.result);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
   const deleteProduct = async (id: number) => {
     try {
-      const response = await deleteProductRequest(id);
+      const { data } = await deleteProductRequest(id);
 
-      if (response.data.success) {
-        setProducts(products.filter((item) => item.id !== id));
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
+      if (!data.success) {
+        console.log(data.message);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+
+      setProducts(products.filter((item) => item.id !== id));
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
