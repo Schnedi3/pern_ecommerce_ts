@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 
 import { defaultCategory } from "./Home";
-import { ICategoriesProps } from "../../types/types";
+import { IProduct } from "../../types/types";
 import { iconArrow } from "../../Routes";
 import styles from "./categories.module.css";
+
+interface ICategoriesProps {
+  selectedCategory: string;
+  setSelectedCategory: (selectedCategory: string) => void;
+  products: IProduct[];
+}
 
 export const Categories = ({
   products,
