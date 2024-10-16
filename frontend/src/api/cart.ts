@@ -16,7 +16,7 @@ export const getCartRequest = () => {
   return axios.get("/cart");
 };
 
-export const updateCartRequest = (
+export const updateProductQuantityRequest = (
   productId: number,
   quantity: number,
   size: string

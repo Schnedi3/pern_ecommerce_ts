@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
-import { useAuthContext } from "../../context/useAuthContext";
-import { useShopContext } from "../../context/useShopContext";
+import { useCartStore } from "../../store/cartStore";
+import { useAuthStore } from "../../store/authStore";
 import { iconCart, iconClose, iconLogin, iconMenu } from "../../Routes";
 import { Modal } from "./Modal";
 import styles from "./menu.module.css";
@@ -11,9 +11,8 @@ export const Menu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
-
-  const { itemsInCart } = useShopContext();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated } = useAuthStore();
+  const { itemsInCart } = useCartStore();
 
   useEffect(() => {
     window.addEventListener("resize", closeMenu);

@@ -1,37 +1,57 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import { useAuthContext } from "../../context/useAuthContext";
-import { useShopContext } from "../../context/useShopContext";
+import { useAuthStore } from "../../store/authStore";
+import { useCartStore } from "../../store/cartStore";
 import {
+  deleteAddressRequest,
+  updateUsernameRequest,
+  AddressModal,
+  Title,
   iconAddress,
   iconDelete,
   iconEdit,
-  AddressModal,
-  deleteAddressRequest,
-  updateUsernameRequest,
-  Title,
 } from "../../Routes";
 import { AddressUpdate } from "./AddressUpdate";
 import { IAddress } from "../../types/types";
 import styles from "./profile.module.css";
 
 export const Profile = () => {
-  const { user, setUser } = useAuthContext();
-  const {
-    getAddress,
-    addressList,
-    setAddressList,
-    isModalAddress,
-    setIsModalAddress,
-  } = useShopContext();
-
-  useEffect(() => {
-    getAddress();
-  }, [getAddress]);
-
   const [isEditUsername, setIsEditUsername] = useState<boolean>(false);
   const [updatedUsername, setUpdatedUsername] = useState<string>("");
+
+  const [isAddAddress, setIsAddAddress] = useState<boolean>(false);
+  const [isEditAddress, setIsEditAddress] = useState<boolean>(false);
+  const [addressData, setAddressData] = useState<IAddress | undefined>(
+    undefined
+  );
+
+  const { user, authData } = useAuthStore();
+  const { addressList, deleteAddressStore, getAddressStore } = useCartStore();
+
+  const handleUpdateAddress = (address: IAddress) => {
+    setIsEditAddress(true);
+    setAddressData(address);
+  };
+
+  useEffect(() => {
+    getAddressStore();
+  }, [getAddressStore]);
+
+  const deleteAddress = async (id: number) => {
+    try {
+      const { data } = await deleteAddressRequest(id);
+
+      if (!data.success) {
+        console.log(data.message);
+      }
+
+      deleteAddressStore(id);
+      toast.success(data.message);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
+    }
+  };
 
   const handleUpdateUser = async (
     e: React.FormEvent<HTMLFormElement>,
@@ -41,47 +61,18 @@ export const Profile = () => {
 
     try {
       if (updatedUsername.trim() !== "") {
-        const response = await updateUsernameRequest(updatedUsername, id);
+        const { data } = await updateUsernameRequest(updatedUsername, id);
 
-        if (response.data.success) {
-          toast.success(response.data.message);
-          setUser(response.data.result);
-          localStorage.setItem("user", JSON.stringify(response.data.result));
-          setIsEditUsername(false);
-        } else {
-          toast.error(response.data.message);
+        if (!data.success) {
+          console.log(data.message);
         }
+
+        authData(data.result);
+        toast.success(data.message);
+        setIsEditUsername(false);
       }
     } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const [isEditAddress, setIsEditAddress] = useState<boolean>(false);
-  const [addressData, setAddressData] = useState<IAddress | undefined>(
-    undefined
-  );
-  const handleUpdateAddress = (address: IAddress) => {
-    setIsEditAddress(true);
-    setAddressData(address);
-  };
-
-  const deleteAddress = async (id: number) => {
-    try {
-      const response = await deleteAddressRequest(id);
-
-      if (response.data.success) {
-        setAddressList(addressList.filter((address) => address.id !== id));
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 
@@ -179,7 +170,7 @@ export const Profile = () => {
 
       <button
         className={styles.addAddress}
-        onClick={() => setIsModalAddress(true)}
+        onClick={() => setIsAddAddress(true)}
       >
         <img
           className={styles.addAddressIcon}
@@ -189,12 +180,16 @@ export const Profile = () => {
         Add new address
       </button>
 
-      {isModalAddress && <AddressModal getAddress={getAddress} />}
+      {isAddAddress && (
+        <AddressModal
+          isAddAddress={isAddAddress}
+          setIsAddAddress={setIsAddAddress}
+        />
+      )}
       {isEditAddress && (
         <AddressUpdate
           isEditAddress={isEditAddress}
           setIsEditAddress={setIsEditAddress}
-          getAddress={getAddress}
           addressData={addressData}
         />
       )}
