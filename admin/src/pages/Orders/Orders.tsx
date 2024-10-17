@@ -1,82 +1,61 @@
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-import { IOrder } from "../../types/types";
+import axios from "../../api/axios";
 import { formatCurrency } from "../../helpers/formatCurrency";
-import {
-  deleteOrderRequest,
-  getOrdersRequest,
-  iconBox,
-  iconDelete,
-  Title,
-  updateOrderRequest,
-} from "../../Routes";
+import { iconBox, iconDelete, Title } from "../../Routes";
+import { IOrder } from "../../types/types";
 import { imagesURL } from "../Config";
 import styles from "./orders.module.css";
 
 export const Orders = () => {
-  const [orders, setOrders] = useState<IOrder[]>([]);
+  const queryClient = useQueryClient();
 
-  const getOrders = async () => {
-    try {
-      const { data } = await getOrdersRequest();
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      setOrders(data.result);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
+  const {
+    data: orders,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["orders"],
+    queryFn: async () => {
+      const { data } = await axios.get(`/order`);
+      return data.result;
+    },
+  });
 
   const handleOnChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
     id: number
   ) => {
     const status = e.target.value;
-    updateOrder(id, status);
+    updateOrder({ id, status });
   };
 
-  const updateOrder = async (id: number, status: string) => {
-    try {
-      const { data } = await updateOrderRequest(id, status);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
+  const { mutate: updateOrder } = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) => {
+      return axios.put(`/order/${id}`, { status });
+    },
+    onSuccess: ({ data }) => {
       toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
 
-  const deleteOrder = async (id: number) => {
-    try {
-      const { data } = await deleteOrderRequest(id);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      setOrders(orders.filter((order) => order.order_id !== id));
+  const { mutate: deleteOrder } = useMutation({
+    mutationFn: (id: number) => {
+      return axios.delete(`/order/${id}`);
+    },
+    onSuccess: ({ data }) => {
       toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
 
-  useEffect(() => {
-    getOrders();
-  }, []);
-
-  if (orders.length === 0) {
+  if (!orders || orders.length === 0 || error || isLoading) {
     return (
       <section className={styles.empty}>
         <img className={styles.emptyIcon} src={iconBox} alt="" />
-        <p className={styles.emptyText}>No orders yet</p>
+        <p className={styles.emptyText}>No data available</p>
       </section>
     );
   }
@@ -85,7 +64,7 @@ export const Orders = () => {
     <section className={styles.orders}>
       <Title title="Orders" />
       <ul className="order">
-        {orders.map((order) => (
+        {orders.map((order: IOrder) => (
           <li className={styles.singleOrder} key={order.order_id}>
             {order.products.map((item) => (
               <img
@@ -143,6 +122,7 @@ export const Orders = () => {
 
             <select
               className={styles.orderSelect}
+              value={order.order_status}
               onChange={(e) => handleOnChange(e, order.order_id)}
             >
               <option value="Order placed">Order placed</option>
