@@ -1,12 +1,6 @@
 // api
 import { adminRequest, loginRequest } from "./api/auth";
 import {
-  deleteOrderRequest,
-  getOrderRequest,
-  getOrdersRequest,
-  updateOrderRequest,
-} from "./api/order";
-import {
   addProductRequest,
   deleteProductRequest,
   getProductsRequest,
@@ -16,10 +10,6 @@ import { deleteUserRequest, getUsersRequest } from "./api/users";
 export {
   adminRequest,
   loginRequest,
-  deleteOrderRequest,
-  getOrderRequest,
-  getOrdersRequest,
-  updateOrderRequest,
   addProductRequest,
   deleteProductRequest,
   getProductsRequest,

@@ -1,17 +1,40 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+
 import axios from "./axios";
 
-export const deleteOrderRequest = (id: number) => {
-  return axios.delete(`/order/${id}`);
+export const useOrders = () => {
+  return useQuery({
+    queryKey: ["orders"],
+    queryFn: async () => {
+      const { data } = await axios.get(`/order`);
+      return data.result;
+    },
+  });
 };
 
-export const getOrderRequest = (id: number) => {
-  return axios.get(`/order/${id}`);
+export const useUpdateOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) => {
+      return axios.put(`/order/${id}`, { status });
+    },
+    onSuccess: ({ data }) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
 };
 
-export const getOrdersRequest = () => {
-  return axios.get("/order");
-};
-
-export const updateOrderRequest = (id: number, status: string) => {
-  return axios.put(`/order/${id}`, { status });
+export const useDeleteOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => {
+      return axios.delete(`/order/${id}`);
+    },
+    onSuccess: ({ data }) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
 };
