@@ -10,45 +10,11 @@ import {
 import { createCartForUser } from "../database/cartDB";
 import {
   createGoogleUserDB,
-  loginUserDB,
-  registerUserDB,
+  loginDB,
+  registerDB,
   resetPasswordDB,
 } from "../database/authDB";
 import { ACCESS_TOKEN, JWT_SECRET, REFRESH_TOKEN } from "../config/config";
-
-export const loginAdmin = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  try {
-    const result = await loginUserDB(email);
-
-    if (result.role === "user") {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid admin credentials" });
-    }
-
-    const isMatch = await bcrypt.compare(password, result.password);
-    if (!isMatch) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid password" });
-    }
-
-    const accessToken = generateAccessToken(result);
-    const refreshToken = generateRefreshToken(result);
-    setAccessCookie(res, accessToken);
-    setRefreshCookie(res, refreshToken);
-
-    res.status(200).json({
-      success: true,
-      message: "Logged in succesfully",
-      result,
-    });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
 
 export const loginGoogle = async (req: Request, res: Response) => {
   const { accessToken } = req.body;
@@ -81,11 +47,11 @@ export const loginGoogle = async (req: Request, res: Response) => {
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const result = await loginUserDB(email);
+    const result = await loginDB(email);
 
     const isMatch = await bcrypt.compare(password, result.password);
     if (!isMatch) {
@@ -109,14 +75,14 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export const registerUser = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
 
   // encrypt password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const result = await registerUserDB(username, email, hashedPassword);
+    const result = await registerDB(username, email, hashedPassword);
 
     // create a cart
     const userId = result.id;
