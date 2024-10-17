@@ -1,5 +1,5 @@
 // api
-import { adminRequest, loginRequest } from "./api/auth";
+import { loginRequest, loginGoogleRequest } from "./api/auth";
 import {
   addProductRequest,
   deleteProductRequest,
@@ -8,8 +8,8 @@ import {
 import { deleteUserRequest, getUsersRequest } from "./api/users";
 
 export {
-  adminRequest,
   loginRequest,
+  loginGoogleRequest,
   addProductRequest,
   deleteProductRequest,
   getProductsRequest,
@@ -29,6 +29,7 @@ import iconClose from "./assets/icons/close.svg";
 import iconDelete from "./assets/icons/delete.svg";
 import iconEyeClosed from "./assets/icons/eye_closed.svg";
 import iconEyeOpen from "./assets/icons/eye_open.svg";
+import iconGoogle from "./assets/icons/google.svg";
 import iconLink from "./assets/icons/link.svg";
 import iconList from "./assets/icons/list.svg";
 import iconLoad from "./assets/icons/load.svg";
@@ -41,6 +42,7 @@ export {
   iconDelete,
   iconEyeClosed,
   iconEyeOpen,
+  iconGoogle,
   iconLink,
   iconList,
   iconLoad,

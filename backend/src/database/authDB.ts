@@ -17,7 +17,7 @@ export const createGoogleUserDB = async (
   return result.rows[0];
 };
 
-export const loginUserDB = async (email: string) => {
+export const loginDB = async (email: string) => {
   const loginQuery = `
     SELECT * FROM "user"
     WHERE email = $1`;
@@ -26,7 +26,7 @@ export const loginUserDB = async (email: string) => {
   return result.rows[0];
 };
 
-export const registerUserDB = async (
+export const registerDB = async (
   username: string,
   email: string,
   hashedPassword: string

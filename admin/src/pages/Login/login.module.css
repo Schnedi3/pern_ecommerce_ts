@@ -2,8 +2,55 @@
 .login {
   height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2rem;
+}
+
+/* GOOGLE BUTTON */
+.gbutton {
+  width: 60%;
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  border-radius: 0.2rem;
+  background-color: var(--black-bg);
+}
+
+.googleIcon {
+  width: 1.2rem;
+}
+
+.gbuttonText {
+  color: var(--white-text);
+}
+
+/* SEPARATOR */
+.separator {
+  position: relative;
+  width: 60%;
+  display: flex;
+  justify-content: center;
+}
+
+.separator > span {
+  content: "";
+  width: 45%;
+  height: 0.05rem;
+  position: absolute;
+  top: 50%;
+  background-color: var(--gray-bg);
+}
+
+.separator > span:nth-child(1) {
+  left: 0;
+}
+
+.separator > span:nth-child(3) {
+  right: 0;
 }
 
 .form {
@@ -62,6 +109,10 @@
 
 /* HOVER */
 @media (hover: hover) {
+  .gbutton:hover {
+    cursor: pointer;
+  }
+
   .input:hover {
     box-shadow: 0 2px 0 0 var(--accent);
   }
@@ -74,6 +125,7 @@
 
 /* ADAPTIVE */
 @media (max-width: 700px) {
+  .gbutton,
   .form {
     width: 100%;
   }
