@@ -1,82 +1,29 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useOrders, useUpdateOrder, useDeleteOrder } from "../../api/order";
 
-import { IOrder } from "../../types/types";
 import { formatCurrency } from "../../helpers/formatCurrency";
-import {
-  deleteOrderRequest,
-  getOrdersRequest,
-  iconBox,
-  iconDelete,
-  Title,
-  updateOrderRequest,
-} from "../../Routes";
+import { iconBox, iconDelete, Title } from "../../Routes";
+import { IOrder } from "../../types/types";
 import { imagesURL } from "../Config";
 import styles from "./orders.module.css";
 
 export const Orders = () => {
-  const [orders, setOrders] = useState<IOrder[]>([]);
-
-  const getOrders = async () => {
-    try {
-      const { data } = await getOrdersRequest();
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      setOrders(data.result);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
+  const { data: orders, error, isLoading } = useOrders();
+  const { mutate: updateOrder } = useUpdateOrder();
+  const { mutate: deleteOrder } = useDeleteOrder();
 
   const handleOnChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
     id: number
   ) => {
     const status = e.target.value;
-    updateOrder(id, status);
+    updateOrder({ id, status });
   };
 
-  const updateOrder = async (id: number, status: string) => {
-    try {
-      const { data } = await updateOrderRequest(id, status);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
-
-  const deleteOrder = async (id: number) => {
-    try {
-      const { data } = await deleteOrderRequest(id);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      setOrders(orders.filter((order) => order.order_id !== id));
-      toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
-
-  useEffect(() => {
-    getOrders();
-  }, []);
-
-  if (orders.length === 0) {
+  if (!orders || orders.length === 0 || error || isLoading) {
     return (
       <section className={styles.empty}>
         <img className={styles.emptyIcon} src={iconBox} alt="" />
-        <p className={styles.emptyText}>No orders yet</p>
+        <p className={styles.emptyText}>No data available</p>
       </section>
     );
   }
@@ -85,7 +32,7 @@ export const Orders = () => {
     <section className={styles.orders}>
       <Title title="Orders" />
       <ul className="order">
-        {orders.map((order) => (
+        {orders.map((order: IOrder) => (
           <li className={styles.singleOrder} key={order.order_id}>
             {order.products.map((item) => (
               <img
@@ -143,6 +90,7 @@ export const Orders = () => {
 
             <select
               className={styles.orderSelect}
+              value={order.order_status}
               onChange={(e) => handleOnChange(e, order.order_id)}
             >
               <option value="Order placed">Order placed</option>
