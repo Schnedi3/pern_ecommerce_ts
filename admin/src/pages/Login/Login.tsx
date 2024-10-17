@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 
 import { useAuthStore } from "../../store/authStore";
 import { ILogin } from "../../types/types";
-import { adminRequest, iconEyeClosed, iconEyeOpen, Title } from "../../Routes";
+import {
+  loginRequest,
+  iconEyeClosed,
+  iconEyeOpen,
+  iconGoogle,
+  Title,
+  loginGoogleRequest,
+} from "../../Routes";
 import styles from "./login.module.css";
+import { toast } from "react-toastify";
 
 export const Login = () => {
   const [visible, setIsVisible] = useState<boolean>(false);
@@ -17,16 +26,45 @@ export const Login = () => {
   const { isAuthenticated, authData } = useAuthStore();
   const navigate = useNavigate();
 
+  const loginGoogle = useGoogleLogin({
+    onSuccess: (codeResponse) => googleLogin(codeResponse.access_token),
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  const googleLogin = async (accessToken: string) => {
+    try {
+      const { data } = await loginGoogleRequest(accessToken);
+
+      if (!data.success) {
+        console.log(data.message);
+      }
+
+      if (data.result.role === "user") {
+        toast.error("Wrong credentials");
+        return;
+      }
+
+      authData(data);
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
+    }
+  };
+
   const onSubmit = (data: ILogin) => {
     login(data);
   };
 
   const login = async (user: ILogin) => {
     try {
-      const { data } = await adminRequest(user);
+      const { data } = await loginRequest(user);
 
       if (!data.success) {
         console.log(data.message);
+      }
+
+      if (data.result.role === "user") {
+        toast.error("Wrong credentials");
+        return;
       }
 
       authData(data);
@@ -41,6 +79,17 @@ export const Login = () => {
 
   return (
     <section className={styles.login}>
+      <button className={styles.gbutton} onClick={() => loginGoogle()}>
+        <img className={styles.googleIcon} src={iconGoogle} />
+        <p className={styles.gbuttonText}>Login with Google</p>
+      </button>
+
+      <article className={styles.separator}>
+        <span></span>
+        <p>or</p>
+        <span></span>
+      </article>
+
       <form
         className={styles.form}
         onSubmit={handleSubmit(onSubmit)}
