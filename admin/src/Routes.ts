@@ -4,15 +4,8 @@ import {
   deleteProductRequest,
   getProductsRequest,
 } from "./api/product";
-import { deleteUserRequest, getUsersRequest } from "./api/users";
 
-export {
-  addProductRequest,
-  deleteProductRequest,
-  getProductsRequest,
-  deleteUserRequest,
-  getUsersRequest,
-};
+export { addProductRequest, deleteProductRequest, getProductsRequest };
 
 // components
 import { Menu } from "./components/Menu/Menu";
@@ -32,6 +25,7 @@ import iconList from "./assets/icons/list.svg";
 import iconLoad from "./assets/icons/load.svg";
 import iconMenu from "./assets/icons/menu.svg";
 import iconUpload from "./assets/icons/upload.svg";
+import iconUser from "./assets/icons/user.svg";
 
 export {
   iconBox,
@@ -45,6 +39,7 @@ export {
   iconLoad,
   iconMenu,
   iconUpload,
+  iconUser,
 };
 
 // pages
