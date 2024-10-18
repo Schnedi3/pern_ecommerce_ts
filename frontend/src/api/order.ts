@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+
 import axios from "./axios";
 
 export const addOrderRequest = (
@@ -22,6 +24,12 @@ export const addStripeOrderRequest = (
   });
 };
 
-export const getUserOrdersRequest = () => {
-  return axios.get("/order/user");
+export const useOrders = () => {
+  return useQuery({
+    queryKey: ["orders"],
+    queryFn: async () => {
+      const { data } = await axios.get(`/order/user`);
+      return data.result;
+    },
+  });
 };
