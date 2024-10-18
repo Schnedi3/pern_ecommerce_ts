@@ -1,3 +1,23 @@
+/* EMPTY */
+.empty {
+  min-height: calc(100vh - var(--menu-height));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emptyIcon {
+  width: clamp(20rem, 50vw, 25rem);
+  opacity: 0.15;
+}
+
+.emptyText {
+  position: absolute;
+  font-weight: 800;
+  font-size: clamp(2.5rem, 5.5vw, 3.5rem);
+  opacity: 0.8;
+}
+
 /* LIST */
 .users {
   margin: 2rem auto;
