@@ -4,17 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 
 import { useAuthStore } from "../../store/authStore";
+import { useLogin, useLoginGoogle } from "../../api/auth";
 import { ILogin } from "../../types/types";
-import {
-  loginRequest,
-  iconEyeClosed,
-  iconEyeOpen,
-  iconGoogle,
-  Title,
-  loginGoogleRequest,
-} from "../../Routes";
+import { iconEyeClosed, iconEyeOpen, iconGoogle, Title } from "../../Routes";
 import styles from "./login.module.css";
-import { toast } from "react-toastify";
 
 export const Login = () => {
   const [visible, setIsVisible] = useState<boolean>(false);
@@ -23,7 +16,9 @@ export const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<ILogin>();
-  const { isAuthenticated, authData } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
+  const { mutate: googleLogin } = useLoginGoogle();
+  const { mutate: login } = useLogin();
   const navigate = useNavigate();
 
   const loginGoogle = useGoogleLogin({
@@ -31,46 +26,8 @@ export const Login = () => {
     onError: (error) => console.log("Login Failed:", error),
   });
 
-  const googleLogin = async (accessToken: string) => {
-    try {
-      const { data } = await loginGoogleRequest(accessToken);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      if (data.result.role === "user") {
-        toast.error("Wrong credentials");
-        return;
-      }
-
-      authData(data);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
-
   const onSubmit = (data: ILogin) => {
     login(data);
-  };
-
-  const login = async (user: ILogin) => {
-    try {
-      const { data } = await loginRequest(user);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      if (data.result.role === "user") {
-        toast.error("Wrong credentials");
-        return;
-      }
-
-      authData(data);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
   };
 
   useEffect(() => {
