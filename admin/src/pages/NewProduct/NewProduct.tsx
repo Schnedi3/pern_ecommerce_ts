@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
 
-import { addProductRequest, iconUpload, Title } from "../../Routes";
+import { useAddProduct } from "../../api/product";
+import { iconUpload, Title } from "../../Routes";
 import styles from "./new.module.css";
 import "../globals.css";
 
@@ -13,6 +13,7 @@ export const NewProduct = () => {
   const [price, setPrice] = useState<string>("");
   const [sizes, setSizes] = useState<string[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const { mutate: addProduct, data } = useAddProduct();
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -39,24 +40,21 @@ export const NewProduct = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const formData = new FormData();
+    const formData = new FormData();
 
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("category", category);
-      formData.append("subcategory", subcategory);
-      formData.append("price", price);
-      sizes.forEach((size) => formData.append("sizes", size));
-      images.forEach((image) => formData.append("images", image));
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("subcategory", subcategory);
+    formData.append("price", price);
+    sizes.forEach((size) => formData.append("sizes", size));
+    images.forEach((image) => formData.append("images", image));
 
-      const { data } = await addProductRequest(formData);
+    addProduct(formData);
+  };
 
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      toast.success(data.message);
+  useEffect(() => {
+    if (data?.data.success) {
       setTitle("");
       setDescription("");
       setCategory("Men");
@@ -64,10 +62,8 @@ export const NewProduct = () => {
       setPrice("");
       setSizes([]);
       setImages([]);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
-  };
+  }, [data]);
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
