@@ -16,8 +16,6 @@ import { addStripeOrderRequest } from "./api/order";
 import { getUserOrdersRequest } from "./api/order";
 import { createCheckoutSessionRequest } from "./api/payment";
 import { fetchCheckoutSessionRequest } from "./api/payment";
-import { getProductRequest } from "./api/product";
-import { getProductsRequest } from "./api/product";
 import { updateUsernameRequest } from "./api/user";
 
 export {
@@ -38,8 +36,6 @@ export {
   getUserOrdersRequest,
   createCheckoutSessionRequest,
   fetchCheckoutSessionRequest,
-  getProductRequest,
-  getProductsRequest,
   updateUsernameRequest,
 };
 

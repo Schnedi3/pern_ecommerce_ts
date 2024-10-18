@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { getProductsRequest } from "../../Routes";
+import { useProducts } from "../../api/product";
 import { ProductCard } from "./ProductCard";
 import { Search } from "./Search";
 import { Categories } from "./Categories";
@@ -12,46 +12,30 @@ import "../globals.css";
 export const defaultCategory: string = "All";
 
 export const Home = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedCategory, setSelectedCategory] =
     useState<string>(defaultCategory);
-
-  const getProducts = useCallback(async () => {
-    try {
-      const { data } = await getProductsRequest();
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      setProducts(data.result);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  }, [setProducts]);
-
-  useEffect(() => {
-    getProducts();
-  }, [getProducts]);
+  const { data: products, error, isLoading } = useProducts();
 
   const filteredProducts = useMemo(() => {
     let filtered = products;
 
     if (selectedCategory !== defaultCategory) {
       filtered = filtered.filter(
-        (product) => product.category === selectedCategory
+        (product: IProduct) => product.category === selectedCategory
       );
     }
 
     if (inputValue) {
-      filtered = filtered.filter((product) =>
+      filtered = filtered.filter((product: IProduct) =>
         product.title.toLowerCase().includes(inputValue.toLowerCase())
       );
     }
 
     return filtered;
   }, [selectedCategory, products, inputValue]);
+
+  if (!products || error || isLoading) return <HomeSkeleton />;
 
   return (
     <section className={styles.home}>
@@ -64,11 +48,7 @@ export const Home = () => {
         />
       </header>
 
-      {filteredProducts.length !== 0 ? (
-        <ProductCard filteredProducts={filteredProducts} />
-      ) : (
-        <HomeSkeleton />
-      )}
+      <ProductCard filteredProducts={filteredProducts} />
     </section>
   );
 };
