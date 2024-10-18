@@ -1,5 +1,4 @@
 // api
-import { loginRequest, loginGoogleRequest } from "./api/auth";
 import {
   addProductRequest,
   deleteProductRequest,
@@ -8,8 +7,6 @@ import {
 import { deleteUserRequest, getUsersRequest } from "./api/users";
 
 export {
-  loginRequest,
-  loginGoogleRequest,
   addProductRequest,
   deleteProductRequest,
   getProductsRequest,
