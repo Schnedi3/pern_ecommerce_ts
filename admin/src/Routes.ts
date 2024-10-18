@@ -1,12 +1,3 @@
-// api
-import {
-  addProductRequest,
-  deleteProductRequest,
-  getProductsRequest,
-} from "./api/product";
-
-export { addProductRequest, deleteProductRequest, getProductsRequest };
-
 // components
 import { Menu } from "./components/Menu/Menu";
 import { Title } from "./components/Title/Title";

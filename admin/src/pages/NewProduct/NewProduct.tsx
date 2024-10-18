@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
 
-import { addProductRequest, iconUpload, Title } from "../../Routes";
+import { useAddProduct } from "../../api/product";
+import { iconUpload, Title } from "../../Routes";
 import styles from "./new.module.css";
 import "../globals.css";
 
@@ -13,6 +13,7 @@ export const NewProduct = () => {
   const [price, setPrice] = useState<string>("");
   const [sizes, setSizes] = useState<string[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const { mutate: addProduct, data } = useAddProduct();
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -39,39 +40,30 @@ export const NewProduct = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const formData = new FormData();
+    const formData = new FormData();
 
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("category", category);
-      formData.append("subcategory", subcategory);
-      formData.append("price", price);
-      sizes.forEach((size) => formData.append("sizes", size));
-      images.forEach((image) => formData.append("images", image));
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("subcategory", subcategory);
+    formData.append("price", price);
+    sizes.forEach((size) => formData.append("sizes", size));
+    images.forEach((image) => formData.append("images", image));
 
-      const response = await addProductRequest(formData);
-
-      if (response.data.success) {
-        toast.success(response.data.message);
-        setTitle("");
-        setDescription("");
-        setCategory("Men");
-        setSubcategory("Top");
-        setPrice("");
-        setSizes([]);
-        setImages([]);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
+    addProduct(formData);
   };
+
+  useEffect(() => {
+    if (data?.data.success) {
+      setTitle("");
+      setDescription("");
+      setCategory("Men");
+      setSubcategory("Top");
+      setPrice("");
+      setSizes([]);
+      setImages([]);
+    }
+  }, [data]);
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
