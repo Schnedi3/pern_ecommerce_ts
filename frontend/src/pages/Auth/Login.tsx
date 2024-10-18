@@ -3,10 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import { toast } from "react-toastify";
 
-import { useAuthStore } from "../../store/authStore";
-import { loginGoogleRequest, loginRequest } from "../../Routes";
+import { useLogin, useLoginGoogle } from "../../api/auth";
 import { loginSchema } from "../../schemas/schemas";
 import { IUser } from "../../types/types";
 import {
@@ -27,43 +25,16 @@ export const Login = () => {
   } = useForm<IUser>({
     resolver: zodResolver(loginSchema),
   });
-  const { authData } = useAuthStore();
+  const { mutate: googleLogin } = useLoginGoogle();
+  const { mutate: loginUser } = useLogin();
 
   const loginGoogle = useGoogleLogin({
     onSuccess: (codeResponse) => googleLogin(codeResponse.access_token),
     onError: (error) => console.log("Login Failed:", error),
   });
 
-  const googleLogin = async (accessToken: string) => {
-    try {
-      const { data } = await loginGoogleRequest(accessToken);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-      authData(data);
-      toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
-
   const onSubmit = (data: IUser) => {
     loginUser(data);
-  };
-
-  const loginUser = async (user: IUser) => {
-    try {
-      const { data } = await loginRequest(user);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-      authData(data);
-      toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
   };
 
   return (

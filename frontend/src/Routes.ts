@@ -3,10 +3,6 @@ import { addAddressRequest } from "./api/address";
 import { deleteAddressRequest } from "./api/address";
 import { getAddressRequest } from "./api/address";
 import { updateAddressRequest } from "./api/address";
-import { loginGoogleRequest } from "./api/auth";
-import { loginRequest } from "./api/auth";
-import { registerRequest } from "./api/auth";
-import { resetPasswordRequest } from "./api/auth";
 import { addToCartRequest } from "./api/cart";
 import { deleteFromCartRequest } from "./api/cart";
 import { getCartRequest } from "./api/cart";
@@ -22,10 +18,6 @@ export {
   deleteAddressRequest,
   getAddressRequest,
   updateAddressRequest,
-  loginGoogleRequest,
-  loginRequest,
-  registerRequest,
-  resetPasswordRequest,
   addToCartRequest,
   deleteFromCartRequest,
   getCartRequest,

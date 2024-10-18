@@ -2,10 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 
-import { useAuthStore } from "../../store/authStore";
-import { registerRequest } from "../../api/auth";
+import { useRegister } from "../../api/auth";
 import { registerSchema } from "../../schemas/schemas";
 import { IUser } from "../../types/types";
 import { Button, iconEyeClosed, iconEyeOpen, Title } from "../../Routes";
@@ -20,24 +18,10 @@ export const Register = () => {
   } = useForm<IUser>({
     resolver: zodResolver(registerSchema),
   });
-  const { authData } = useAuthStore();
+  const { mutate: registerUser } = useRegister();
 
   const onSubmit = (data: IUser) => {
     registerUser(data);
-  };
-
-  const registerUser = async (user: IUser) => {
-    try {
-      const { data } = await registerRequest(user);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-      authData(data);
-      toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
   };
 
   return (

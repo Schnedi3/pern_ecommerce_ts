@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
-import { resetPasswordRequest } from "../../Routes";
+import { useResetPassword } from "../../api/auth";
 import { loginSchema } from "../../schemas/schemas";
 import { IUser } from "../../types/types";
 import { Button, iconEyeClosed, iconEyeOpen, Title } from "../../Routes";
@@ -20,26 +18,11 @@ export const ResetPassword = () => {
   } = useForm<IUser>({
     resolver: zodResolver(loginSchema),
   });
-  const navigate = useNavigate();
+  const { mutate: resetPassword } = useResetPassword();
 
   const onSubmit = (data: IUser) => {
     resetPassword(data);
     reset();
-  };
-
-  const resetPassword = async (user: IUser) => {
-    try {
-      const { data } = await resetPasswordRequest(user);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      toast.success(data.message);
-      navigate("/login");
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
   };
 
   return (
