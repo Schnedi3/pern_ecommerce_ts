@@ -1,3 +1,10 @@
+// address
+export interface IAddressStore {
+  addressList: IAddress[];
+  getAddressStore: () => void;
+  deleteAddressStore: (id: number) => void;
+}
+
 // auth
 export interface IAuthStore {
   isAuthenticated: boolean;

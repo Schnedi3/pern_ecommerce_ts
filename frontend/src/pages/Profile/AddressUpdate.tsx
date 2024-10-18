@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 
-import { useCartStore } from "../../store/cartStore";
+import { useAddressStore } from "../../store/addressStore";
 import { Button, iconClose, Title, updateAddressRequest } from "../../Routes";
 import { IAddress } from "../../types/types";
 import { addressSchema } from "../../schemas/schemas";
@@ -12,14 +12,12 @@ import styles from "./address.module.css";
 interface IAddressProps {
   isEditAddress: boolean;
   setIsEditAddress: (isEditAddress: boolean) => void;
-  getAddress: () => void;
   addressData: IAddress | undefined;
 }
 
 export const AddressUpdate = ({
   isEditAddress,
   setIsEditAddress,
-  getAddress,
   addressData,
 }: IAddressProps) => {
   const {
@@ -30,28 +28,25 @@ export const AddressUpdate = ({
     resolver: zodResolver(addressSchema),
     defaultValues: addressData,
   });
+  const { getAddressStore } = useAddressStore();
 
-  const onSubmit = async (data: IAddress) => {
+  const onSubmit = async (address: IAddress) => {
     try {
       if (addressData) {
-        const response = await updateAddressRequest(data, addressData.id);
+        const { data } = await updateAddressRequest(address, addressData.id);
 
-        if (response.data.success) {
-          toast.success(response.data.message);
-          getAddress();
-          setIsEditAddress(false);
-        } else {
-          console.log(response.data.message);
+        if (!data.success) {
+          console.log(data.message);
         }
+
+        toast.success(data.message);
+        getAddressStore();
+        setIsEditAddress(false);
       } else {
         toast.error("No address data available");
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : "Unexpected error");
     }
   };
 

@@ -4,6 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { useNavigate } from "react-router-dom";
 
 import { useCartStore } from "../../store/cartStore";
+import { useAddressStore } from "../../store/addressStore";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import {
   createCheckoutSessionRequest,
@@ -21,20 +22,13 @@ export const OrderSummary = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<number>(0);
   const [isAddAddress, setIsAddAddress] = useState<boolean>(false);
-  const { cart, getCartStore, totalAmount } =
-    useCartStore();
+  const { cart, getCartStore, totalAmount } = useCartStore();
+  const { addressList, getAddressStore } = useAddressStore();
   const navigate = useNavigate();
 
-  const {
-    getAddress,
-    addressList,
-    isModalAddress,
-    setIsModalAddress,
-  } = useShopContext();
-
   useEffect(() => {
-    getAddress();
-  }, [getAddress]);
+    getAddressStore();
+  }, [getAddressStore]);
 
   const handleStripeCheckout = async () => {
     try {
@@ -175,7 +169,12 @@ export const OrderSummary = () => {
         Add new address
       </button>
 
-      {isModalAddress && <AddressModal getAddress={getAddress} />}
+      {isAddAddress && (
+        <AddressModal
+          isAddAddress={isAddAddress}
+          setIsAddAddress={setIsAddAddress}
+        />
+      )}
 
       <button
         className="dark_button"
