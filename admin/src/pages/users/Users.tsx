@@ -1,56 +1,26 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-
+import { useDeleteUser, useUsers } from "../../api/users";
 import { IUser } from "../../types/types";
-import {
-  deleteUserRequest,
-  getUsersRequest,
-  iconDelete,
-  Title,
-} from "../../Routes";
+import { iconDelete, iconUser, Title } from "../../Routes";
 import styles from "./users.module.css";
 
 export const Users = () => {
-  const [users, setUsers] = useState<IUser[]>([]);
+  const { data: users, error, isLoading } = useUsers();
+  const { mutate: deleteUser } = useDeleteUser();
 
-  const getUsers = async () => {
-    try {
-      const { data } = await getUsersRequest();
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      setUsers(data.result);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
-
-  const deleteUser = async (id: number) => {
-    try {
-      const { data } = await deleteUserRequest(id);
-
-      if (!data.success) {
-        console.log(data.message);
-      }
-
-      setUsers(users.filter((user) => user.id !== id));
-      toast.success(data.message);
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : "Unexpected error");
-    }
-  };
-
-  useEffect(() => {
-    getUsers();
-  }, []);
+  if (!users || users.length === 0 || error || isLoading) {
+    return (
+      <section className={styles.empty}>
+        <img className={styles.emptyIcon} src={iconUser} alt="" />
+        <p className={styles.emptyText}>No data available</p>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.users}>
       <Title title="Users" />
       <ul className={styles.usersList}>
-        {users.map((user) => (
+        {users.map((user: IUser) => (
           <li className={styles.user} key={user.id}>
             <h3>{user.id}</h3>
             <h3>{user.username}</h3>
