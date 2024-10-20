@@ -1,18 +1,20 @@
 import { Link } from "react-router-dom";
 
-import { useShopContext } from "../../context/useShopContext";
+import { useCart } from "../../api/cart";
+import { ICartItem, IProductCardProps } from "../../types/types";
 import { formatCurrency } from "../../helpers/formatCurrency";
-import { IProductCardProps } from "../../types/types";
 import { imagesURL } from "../config";
 import styles from "./card.module.css";
 
 export const ProductCard = ({ filteredProducts }: IProductCardProps) => {
-  const { cart } = useShopContext();
+  const { data: cart } = useCart();
 
   return (
     <section className={styles.cards}>
       {filteredProducts.map((product) => {
-        const onCart = cart.some((item) => item.product_id === product.id);
+        const onCart = cart?.some(
+          (item: ICartItem) => item.product_id === product.id
+        );
         return (
           <Link
             className={styles.card}

@@ -16,7 +16,7 @@ export interface IUser {
 }
 
 // cart
-export interface CartItem extends IProduct {
+export interface ICartItem extends IProduct {
   product_id: number;
   quantity: number;
   size: string;
@@ -83,13 +83,4 @@ export interface IProduct {
 export interface ISearchProps {
   inputValue: string;
   setInputValue: (inputValue: string) => void;
-}
-
-export interface ShopContextType {
-  // cart
-  cart: CartItem[];
-  setCart: (cart: CartItem[]) => void;
-  getCart: () => void;
-  itemsInCart: number;
-  totalAmount: number;
 }

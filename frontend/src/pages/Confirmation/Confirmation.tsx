@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { useShopContext } from "../../context/useShopContext";
 import {
   addStripeOrderRequest,
   fetchCheckoutSessionRequest,
@@ -15,7 +14,6 @@ export const Confirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const sessionId = new URLSearchParams(location.search).get("session_id");
-  const { getCart } = useShopContext();
 
   console.log("sessionId from confirmation", sessionId);
 
@@ -39,9 +37,7 @@ export const Confirmation = () => {
             sessionId
           );
 
-          if (res.data.success) {
-            getCart();
-          } else {
+          if (!res.data.success) {
             toast.error(res.data.message);
             navigate("/cart");
           }
@@ -57,7 +53,7 @@ export const Confirmation = () => {
     };
 
     getSessionDetails();
-  }, [sessionId, navigate, getCart]);
+  }, [sessionId, navigate]);
 
   return (
     <section className={styles.confirm}>

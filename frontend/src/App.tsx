@@ -8,7 +8,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { RootLayout } from "./layout/RootLayout";
-import { ShopProvider } from "./context/ShopContext";
 import {
   Cart,
   Confirmation,
@@ -57,9 +56,7 @@ export const App = () => {
         newestOnTop={true}
       />
 
-      <ShopProvider>
-        <RouterProvider router={router} />
-      </ShopProvider>
+      <RouterProvider router={router} />
     </main>
   );
 };

@@ -1,72 +1,42 @@
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 import { useAuthStore } from "../../store/authStore";
-import { useShopContext } from "../../context/useShopContext";
-import { formatCurrency } from "../../helpers/formatCurrency";
 import {
-  deleteFromCartRequest,
-  iconCart,
-  iconDelete,
-  Title,
-  updateCartRequest,
-} from "../../Routes";
+  useCart,
+  useDeleteFromCart,
+  useUpdateProductQuantity,
+} from "../../api/cart";
+import { ICartItem } from "../../types/types";
+import { formatCurrency } from "../../helpers/formatCurrency";
+import { iconCart, iconDelete, Title } from "../../Routes";
 import { imagesURL } from "../config";
 import styles from "./cart.module.css";
 
 export const Cart = () => {
-  const { cart, setCart, getCart, totalAmount } = useShopContext();
   const { isAuthenticated } = useAuthStore();
+  const { data: cart, error, isLoading } = useCart();
+  const { mutate: updateProductQuantity } = useUpdateProductQuantity();
+  const { mutate: deleteFromCart } = useDeleteFromCart();
   const navigate = useNavigate();
 
-  const updateQuantity = async (
-    productId: number,
+  const handleUpdateProductQuantity = (
+    id: number,
     quantity: number,
     size: string
   ) => {
-    try {
-      const response = await updateCartRequest(productId, quantity, size);
-
-      if (response.data.success) {
-        const updateItem = response.data.result;
-        setCart(
-          cart.map((item) => (item.id === productId ? updateItem : item))
-        );
-        getCart();
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
+    updateProductQuantity({ id, quantity, size });
   };
 
-  const deleteProduct = async (product_id: number, size: string) => {
-    try {
-      const response = await deleteFromCartRequest(product_id, size);
-
-      if (response.data.success) {
-        setCart(cart.filter((item) => item.id !== product_id));
-        getCart();
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
+  const handleDeleteFromCart = (id: number, size: string) => {
+    deleteFromCart({ id, size });
   };
 
-  if (!isAuthenticated) {
+  const totalAmount = cart?.reduce(
+    (acc: number, item: ICartItem) => acc + item.price * item.quantity,
+    0
+  );
+
+  if (!isAuthenticated || !cart || error || isLoading) {
     return (
       <section className={styles.empty}>
         <img
@@ -74,7 +44,7 @@ export const Cart = () => {
           src={iconCart}
           alt="empty cart icon"
         />
-        <p className={styles.emptyText}>Please login first</p>
+        <p className={styles.emptyText}>No data available</p>
       </section>
     );
   }
@@ -97,35 +67,39 @@ export const Cart = () => {
       <article>
         <Title title="Cart" />
 
-        {cart.map((item, index) => (
-          <div className={styles.product} key={index}>
+        {cart.map((product: ICartItem) => (
+          <div className={styles.product} key={product.product_id}>
             <img
               className={styles.productImage}
-              src={`${imagesURL}/${item.images[0]}`}
-              alt={item.title}
+              src={`${imagesURL}/${product.images[0]}`}
+              alt={product.title}
             />
-            <h3 className={styles.productTitle}>{item.title}</h3>
+            <h3 className={styles.productTitle}>{product.title}</h3>
             <input
               className={styles.input}
               type="number"
               id="quantity"
               min={1}
-              defaultValue={item.quantity}
+              defaultValue={product.quantity}
               onChange={(e) =>
-                updateQuantity(
-                  item.product_id,
+                handleUpdateProductQuantity(
+                  product.product_id,
                   Number(e.target.value),
-                  item.size
+                  product.size
                 )
               }
             />
-            <p className={styles.productText}>{item.size}</p>
-            <p className={styles.productText}>{formatCurrency(item.price)}</p>
+            <p className={styles.productText}>{product.size}</p>
+            <p className={styles.productText}>
+              {formatCurrency(product.price)}
+            </p>
             <img
               className={styles.delete}
               src={iconDelete}
               alt="delete product"
-              onClick={() => deleteProduct(item.product_id, item.size)}
+              onClick={() =>
+                handleDeleteFromCart(product.product_id, product.size)
+              }
             />
           </div>
         ))}

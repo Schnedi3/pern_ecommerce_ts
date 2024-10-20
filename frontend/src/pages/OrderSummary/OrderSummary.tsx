@@ -3,8 +3,9 @@ import { toast } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { useNavigate } from "react-router-dom";
 
+import { useCart } from "../../api/cart";
 import { useAddress } from "../../api/address";
-import { useShopContext } from "../../context/useShopContext";
+import { IAddress, ICartItem } from "../../types/types";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import {
   createCheckoutSessionRequest,
@@ -13,7 +14,6 @@ import {
   addOrderRequest,
   Title,
 } from "../../Routes";
-import { IAddress } from "../../types/types";
 import { imagesURL } from "../config";
 import styles from "./summary.module.css";
 
@@ -23,10 +23,15 @@ export const OrderSummary = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<number>(0);
   const [isAddAddress, setIsAddAddress] = useState<boolean>(false);
+  const { data: cart } = useCart();
   const { data: addressList, error, isLoading } = useAddress();
+
   const navigate = useNavigate();
 
-  const { cart, getCart, totalAmount } = useShopContext();
+  const totalAmount = cart?.reduce(
+    (acc: number, product: ICartItem) => acc + product.price * product.quantity,
+    0
+  );
 
   const handleStripeCheckout = async () => {
     try {
@@ -60,7 +65,6 @@ export const OrderSummary = () => {
       );
 
       if (response.data.success) {
-        getCart();
         navigate("/success");
       } else {
         toast.error(response.data.message);
@@ -81,17 +85,17 @@ export const OrderSummary = () => {
     <section className={styles.order}>
       <article className={styles.cart}>
         <Title title="Summary" />
-        {cart.map((item, index) => (
-          <div className={styles.product} key={index}>
+        {cart.map((product: ICartItem) => (
+          <div className={styles.product} key={product.product_id}>
             <img
               className={styles.productImage}
-              src={`${imagesURL}/${item.images[0]}`}
-              alt={item.title}
+              src={`${imagesURL}/${product.images[0]}`}
+              alt={product.title}
             />
-            <h3>{item.title}</h3>
-            <p>{item.quantity}</p>
-            <p>{item.size}</p>
-            <p>{formatCurrency(item.price)}</p>
+            <h3>{product.title}</h3>
+            <p>{product.quantity}</p>
+            <p>{product.size}</p>
+            <p>{formatCurrency(product.price)}</p>
           </div>
         ))}
 
