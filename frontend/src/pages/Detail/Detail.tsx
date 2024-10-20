@@ -4,53 +4,33 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 
 import { useAuthStore } from "../../store/authStore";
-import { useShopContext } from "../../context/useShopContext";
+import { useAddToCart, useCart } from "../../api/cart";
 import { useProduct } from "../../api/product";
-import { addToCartRequest, iconNext, iconPrevious } from "../../Routes";
-import { DetailSkeleton } from "../../skeletons/DetailSkeleton";
+import { iconNext, iconPrevious } from "../../Routes";
+import { ICartItem } from "../../types/types";
 import { formatCurrency } from "../../helpers/formatCurrency";
-import { IProduct } from "../../types/types";
+import { DetailSkeleton } from "../../skeletons/DetailSkeleton";
 import { imagesURL } from "../config";
 import styles from "./detail.module.css";
 
 export const Detail = () => {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [currentImage, setCurrentImage] = useState(0);
-  const { cart, setCart, getCart } = useShopContext();
   const { isAuthenticated } = useAuthStore();
   const { id } = useParams();
   const { data: product, error, isLoading } = useProduct(Number(id));
+  const { data: cart } = useCart();
+  const { mutate: addToCart } = useAddToCart();
 
-  const addToCart = async (
-    product: IProduct,
+  const handleAddToCart = (
+    id: number,
     quantity: number,
     selectedSize: string
   ) => {
     if (!selectedSize) return toast.error("Select a size first");
     if (!isAuthenticated) return toast.error("Login first");
 
-    try {
-      const response = await addToCartRequest(
-        product.id,
-        quantity,
-        selectedSize
-      );
-
-      if (response.data.success) {
-        const newItem = response.data.result;
-        setCart([...cart, newItem]);
-        getCart();
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
+    addToCart({ id, quantity, selectedSize });
   };
 
   const handlePrevious = () => {
@@ -61,8 +41,8 @@ export const Detail = () => {
   };
 
   const isSizeInCart = (size: string) => {
-    return cart.some(
-      (item) => item.product_id === product.id && item.size === size
+    return cart?.some(
+      (item: ICartItem) => item.product_id === product.id && item.size === size
     );
   };
 
@@ -127,7 +107,7 @@ export const Detail = () => {
             !selectedSize ? "dark_button-disabled" : ""
           }`}
           onClick={() => {
-            addToCart(product, 1, selectedSize), setSelectedSize("");
+            handleAddToCart(product.id, 1, selectedSize), setSelectedSize("");
           }}
         >
           Add to Cart
