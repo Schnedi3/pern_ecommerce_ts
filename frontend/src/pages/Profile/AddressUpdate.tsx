@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
 
-import { Button, iconClose, Title, updateAddressRequest } from "../../Routes";
+import { useUpdateAddress } from "../../api/address";
+import { Button, iconClose, Title } from "../../Routes";
 import { IAddress } from "../../types/types";
 import { addressSchema } from "../../schemas/schemas";
 import styles from "./address.module.css";
@@ -11,14 +11,12 @@ import styles from "./address.module.css";
 interface IAddressProps {
   isEditAddress: boolean;
   setIsEditAddress: (isEditAddress: boolean) => void;
-  getAddress: () => void;
   addressData: IAddress | undefined;
 }
 
 export const AddressUpdate = ({
   isEditAddress,
   setIsEditAddress,
-  getAddress,
   addressData,
 }: IAddressProps) => {
   const {
@@ -29,30 +27,18 @@ export const AddressUpdate = ({
     resolver: zodResolver(addressSchema),
     defaultValues: addressData,
   });
+  const { mutate: updateAddress, data } = useUpdateAddress();
 
-  const onSubmit = async (data: IAddress) => {
-    try {
-      if (addressData) {
-        const response = await updateAddressRequest(data, addressData.id);
-
-        if (response.data.success) {
-          toast.success(response.data.message);
-          getAddress();
-          setIsEditAddress(false);
-        } else {
-          console.log(response.data.message);
-        }
-      } else {
-        toast.error("No address data available");
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
+  const onSubmit = async (address: IAddress) => {
+    if (addressData) {
+      const { id } = addressData;
+      updateAddress({ address, id });
     }
   };
+
+  if (data?.data.success) {
+    setIsEditAddress(false);
+  }
 
   useEffect(() => {
     if (isEditAddress) {

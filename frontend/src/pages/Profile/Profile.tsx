@@ -1,15 +1,13 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useState } from "react";
 
 import { useAuthStore } from "../../store/authStore";
-import { useShopContext } from "../../context/useShopContext";
 import { useUpdateUsername } from "../../api/user";
+import { useAddress, useDeleteAddress } from "../../api/address";
 import {
   iconAddress,
   iconDelete,
   iconEdit,
   AddressModal,
-  deleteAddressRequest,
   Title,
 } from "../../Routes";
 import { AddressUpdate } from "./AddressUpdate";
@@ -17,22 +15,17 @@ import { IAddress } from "../../types/types";
 import styles from "./profile.module.css";
 
 export const Profile = () => {
-  const {
-    getAddress,
-    addressList,
-    setAddressList,
-    isModalAddress,
-    setIsModalAddress,
-  } = useShopContext();
-  const { user } = useAuthStore();
-  const { mutate: updateUsername } = useUpdateUsername();
-
-  useEffect(() => {
-    getAddress();
-  }, [getAddress]);
-
   const [isEditUsername, setIsEditUsername] = useState<boolean>(false);
   const [updatedUsername, setUpdatedUsername] = useState<string>("");
+  const [isAddAddress, setIsAddAddress] = useState<boolean>(false);
+  const [isEditAddress, setIsEditAddress] = useState<boolean>(false);
+  const [addressData, setAddressData] = useState<IAddress | undefined>(
+    undefined
+  );
+  const { user } = useAuthStore();
+  const { mutate: updateUsername } = useUpdateUsername();
+  const { mutate: deleteAddress } = useDeleteAddress();
+  const { data: addressList } = useAddress();
 
   const handleUpdateUser = async (
     e: React.FormEvent<HTMLFormElement>,
@@ -46,32 +39,9 @@ export const Profile = () => {
     }
   };
 
-  const [isEditAddress, setIsEditAddress] = useState<boolean>(false);
-  const [addressData, setAddressData] = useState<IAddress | undefined>(
-    undefined
-  );
   const handleUpdateAddress = (address: IAddress) => {
     setIsEditAddress(true);
     setAddressData(address);
-  };
-
-  const deleteAddress = async (id: number) => {
-    try {
-      const response = await deleteAddressRequest(id);
-
-      if (response.data.success) {
-        setAddressList(addressList.filter((address) => address.id !== id));
-        toast.success(response.data.message);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
   };
 
   return (
@@ -117,8 +87,8 @@ export const Profile = () => {
         <Title title="Your addresses" />
 
         <div className={styles.addresses}>
-          {addressList.map((address) => (
-            <label className={styles.label} key={address.first_name}>
+          {addressList?.map((address: IAddress) => (
+            <div className={styles.label} key={address.first_name}>
               <div>
                 <h4 className={styles.name}>
                   {address.first_name} {address.last_name}
@@ -161,14 +131,14 @@ export const Profile = () => {
                   />
                 </button>
               </div>
-            </label>
+            </div>
           ))}
         </div>
       </article>
 
       <button
         className={styles.addAddress}
-        onClick={() => setIsModalAddress(true)}
+        onClick={() => setIsEditAddress(true)}
       >
         <img
           className={styles.addAddressIcon}
@@ -178,12 +148,16 @@ export const Profile = () => {
         Add new address
       </button>
 
-      {isModalAddress && <AddressModal getAddress={getAddress} />}
+      {isAddAddress && (
+        <AddressModal
+          isAddAddress={isAddAddress}
+          setIsAddAddress={setIsAddAddress}
+        />
+      )}
       {isEditAddress && (
         <AddressUpdate
           isEditAddress={isEditAddress}
           setIsEditAddress={setIsEditAddress}
-          getAddress={getAddress}
           addressData={addressData}
         />
       )}

@@ -67,28 +67,28 @@ export const deleteAddress = async (req: Request, res: Response) => {
 export const updateAddress = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const {
-    firstName,
-    lastName,
+    first_name,
+    last_name,
     phone,
     street,
     number,
     door,
     city,
     state,
-    zipCode,
+    zip_code,
   } = req.body;
 
   try {
     const result = await updateAddressDB(
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       phone,
       street,
       number,
       door,
       city,
       state,
-      zipCode,
+      zip_code,
       id
     );
 
