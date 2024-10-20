@@ -1,32 +1,27 @@
 import { useState } from "react";
-import { toast } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
-import { useNavigate } from "react-router-dom";
 
 import { useCart } from "../../api/cart";
 import { useAddress } from "../../api/address";
+import { useCodOrder } from "../../api/order";
+import { useCheckoutSession } from "../../api/payment";
 import { IAddress, ICartItem } from "../../types/types";
 import { formatCurrency } from "../../helpers/formatCurrency";
-import {
-  createCheckoutSessionRequest,
-  AddressModal,
-  iconAddress,
-  addOrderRequest,
-  Title,
-} from "../../Routes";
+import { AddressModal, iconAddress, Title } from "../../Routes";
 import { imagesURL } from "../config";
 import styles from "./summary.module.css";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export const OrderSummary = () => {
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<number>(0);
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [isAddAddress, setIsAddAddress] = useState<boolean>(false);
   const { data: cart } = useCart();
   const { data: addressList, error, isLoading } = useAddress();
-
-  const navigate = useNavigate();
+  const { mutate: addCodOrder } = useCodOrder();
+  const { mutate: createCheckoutSession, data: sessionData } =
+    useCheckoutSession();
 
   const totalAmount = cart?.reduce(
     (acc: number, product: ICartItem) => acc + product.price * product.quantity,
@@ -34,49 +29,22 @@ export const OrderSummary = () => {
   );
 
   const handleStripeCheckout = async () => {
-    try {
-      const stripe = await stripePromise;
+    const stripe = await stripePromise;
 
-      const response = await createCheckoutSessionRequest(
-        cart,
-        shippingAddress,
-        totalAmount,
-        paymentMethod
-      );
+    createCheckoutSession({
+      cart,
+      shippingAddress,
+      totalAmount,
+      paymentMethod,
+    });
 
-      if (response.data.success) {
-        stripe &&
-          (await stripe.redirectToCheckout({ sessionId: response.data.id }));
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.error("Error creating checkout session:", error);
-      toast.error("Failed to redirect to Stripe Checkout");
+    if (sessionData && stripe) {
+      stripe.redirectToCheckout({ sessionId: sessionData.data.id });
     }
   };
 
-  const handleCodCheckout = async () => {
-    try {
-      const response = await addOrderRequest(
-        shippingAddress,
-        totalAmount,
-        paymentMethod
-      );
-
-      if (response.data.success) {
-        navigate("/success");
-      } else {
-        toast.error(response.data.message);
-        navigate("/cart");
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
+  const handleCodCheckout = () => {
+    addCodOrder({ shippingAddress, totalAmount, paymentMethod });
   };
 
   if (!addressList || !cart || error || isLoading) return <p>No data</p>;

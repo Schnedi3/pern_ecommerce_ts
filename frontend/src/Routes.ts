@@ -1,16 +1,3 @@
-// api
-import { addOrderRequest } from "./api/order";
-import { addStripeOrderRequest } from "./api/order";
-import { createCheckoutSessionRequest } from "./api/payment";
-import { fetchCheckoutSessionRequest } from "./api/payment";
-
-export {
-  addOrderRequest,
-  addStripeOrderRequest,
-  createCheckoutSessionRequest,
-  fetchCheckoutSessionRequest,
-};
-
 // components
 import { AddressModal } from "./components/AddressModal/AddressModal";
 import { Button } from "./components/Button/Button";

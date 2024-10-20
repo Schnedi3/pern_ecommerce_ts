@@ -1,19 +1,39 @@
-import axios from "./axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const createCheckoutSessionRequest = (
-  cartItems: unknown,
-  addressId: number,
-  amount: number,
-  paymentMethod: string
-) => {
-  return axios.post("/payment/checkout-session", {
-    cartItems,
-    addressId,
-    amount,
-    paymentMethod,
+import axios from "./axios";
+import { ICartItem } from "../types/types";
+
+export const useFetchCheckoutSession = (sessionId: string) => {
+  return useQuery({
+    queryKey: ["session", sessionId],
+    queryFn: async () => {
+      const { data } = await axios.get(
+        `/payment/checkout-session?session_id=${sessionId}`
+      );
+      return data;
+    },
   });
 };
 
-export const fetchCheckoutSessionRequest = (sessionId: string) => {
-  return axios.get(`/payment/checkout-session?session_id=${sessionId}`);
+export const useCheckoutSession = () => {
+  return useMutation({
+    mutationFn: ({
+      cart,
+      shippingAddress,
+      totalAmount,
+      paymentMethod,
+    }: {
+      cart: ICartItem[];
+      shippingAddress: number;
+      totalAmount: number;
+      paymentMethod: string;
+    }) => {
+      return axios.post("/payment/checkout-session", {
+        cart,
+        shippingAddress,
+        totalAmount,
+        paymentMethod,
+      });
+    },
+  });
 };

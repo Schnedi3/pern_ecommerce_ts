@@ -5,12 +5,12 @@ import { FRONTEND_URL, STRIPE_SECRET_KEY } from "../config/config";
 const stripe = new Stripe(STRIPE_SECRET_KEY as string);
 
 export const createCheckoutSession = async (req: Request, res: Response) => {
-  const { cartItems, addressId, amount, paymentMethod } = req.body;
+  const { cart, shippingAddress, totalAmount, paymentMethod } = req.body;
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      line_items: cartItems.map((item: any) => ({
+      line_items: cart.map((item: any) => ({
         price_data: {
           currency: "eur",
           product_data: {
@@ -23,7 +23,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       mode: "payment",
       success_url: `${FRONTEND_URL}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/cart`,
-      metadata: { addressId, amount, paymentMethod },
+      metadata: { shippingAddress, totalAmount, paymentMethod },
     });
 
     res.json({ success: true, id: session.id });
