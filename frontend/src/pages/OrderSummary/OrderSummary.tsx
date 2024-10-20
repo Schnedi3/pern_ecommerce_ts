@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { loadStripe } from "@stripe/stripe-js";
 import { useNavigate } from "react-router-dom";
 
+import { useAddress } from "../../api/address";
 import { useShopContext } from "../../context/useShopContext";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import {
@@ -12,6 +13,7 @@ import {
   addOrderRequest,
   Title,
 } from "../../Routes";
+import { IAddress } from "../../types/types";
 import { imagesURL } from "../config";
 import styles from "./summary.module.css";
 
@@ -20,21 +22,11 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 export const OrderSummary = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<number>(0);
-  const { getCart } = useShopContext();
+  const [isAddAddress, setIsAddAddress] = useState<boolean>(false);
+  const { data: addressList, error, isLoading } = useAddress();
   const navigate = useNavigate();
 
-  const {
-    cart,
-    totalAmount,
-    getAddress,
-    addressList,
-    isModalAddress,
-    setIsModalAddress,
-  } = useShopContext();
-
-  useEffect(() => {
-    getAddress();
-  }, [getAddress]);
+  const { cart, getCart, totalAmount } = useShopContext();
 
   const handleStripeCheckout = async () => {
     try {
@@ -82,6 +74,8 @@ export const OrderSummary = () => {
       }
     }
   };
+
+  if (!addressList || !cart || error || isLoading) return <p>No data</p>;
 
   return (
     <section className={styles.order}>
@@ -139,7 +133,7 @@ export const OrderSummary = () => {
       <article className={styles.addresses}>
         <Title title="Delivery address" />
         <div className={styles.addressInfo}>
-          {addressList.map((address) => (
+          {addressList.map((address: IAddress) => (
             <label className={styles.addressLabel} key={address.first_name}>
               <input
                 className={styles.addressRadio}
@@ -169,7 +163,7 @@ export const OrderSummary = () => {
 
       <button
         className={styles.addAddress}
-        onClick={() => setIsModalAddress(true)}
+        onClick={() => setIsAddAddress(true)}
       >
         <img
           className={styles.addAddressIcon}
@@ -179,15 +173,19 @@ export const OrderSummary = () => {
         Add new address
       </button>
 
-      {isModalAddress && <AddressModal getAddress={getAddress} />}
+      {isAddAddress && (
+        <AddressModal
+          isAddAddress={isAddAddress}
+          setIsAddAddress={setIsAddAddress}
+        />
+      )}
 
       <button
-        className="dark_button"
-        id={
+        className={`dark_button ${
           paymentMethod === "" || shippingAddress === 0
             ? "dark_button-disabled"
             : ""
-        }
+        }`}
         onClick={
           paymentMethod === "cod" ? handleCodCheckout : handleStripeCheckout
         }

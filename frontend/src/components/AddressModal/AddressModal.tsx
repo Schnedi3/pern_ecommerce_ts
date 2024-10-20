@@ -1,21 +1,22 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
 
-import { useShopContext } from "../../context/useShopContext";
-import { addAddressRequest, Button, iconClose, Title } from "../../Routes";
+import { useAddAddress } from "../../api/address";
+import { Button, iconClose, Title } from "../../Routes";
 import { IAddress } from "../../types/types";
 import { addressSchema } from "../../schemas/schemas";
 import styles from "./address.module.css";
 
 interface IAddressProps {
-  getAddress: () => void;
+  isAddAddress: boolean;
+  setIsAddAddress: (isAddAddress: boolean) => void;
 }
 
-export const AddressModal = ({ getAddress }: IAddressProps) => {
-  const { isModalAddress, setIsModalAddress } = useShopContext();
-
+export const AddressModal = ({
+  isAddAddress,
+  setIsAddAddress,
+}: IAddressProps) => {
   const {
     register,
     handleSubmit,
@@ -24,38 +25,23 @@ export const AddressModal = ({ getAddress }: IAddressProps) => {
   } = useForm<IAddress>({
     resolver: zodResolver(addressSchema),
   });
+  const { mutate: addAddress } = useAddAddress();
 
-  const onSubmit = async (data: IAddress) => {
-    try {
-      const response = await addAddressRequest(data);
-
-      if (response.data.success) {
-        toast.success(response.data.message);
-        getAddress();
-        setIsModalAddress(false);
-      } else {
-        console.log(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
-
+  const onSubmit = async (address: IAddress) => {
+    addAddress(address);
+    setIsAddAddress(false);
     reset();
   };
 
   useEffect(() => {
-    if (isModalAddress) {
+    if (isAddAddress) {
       document.body.style.overflow = "hidden";
     }
 
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isModalAddress]);
+  }, [isAddAddress]);
 
   return (
     <section className={styles.modal}>
@@ -66,7 +52,7 @@ export const AddressModal = ({ getAddress }: IAddressProps) => {
       >
         <button
           className={styles.closeModal}
-          onClick={() => setIsModalAddress(false)}
+          onClick={() => setIsAddAddress(false)}
         >
           <img className={styles.closeIcon} src={iconClose} alt="close modal" />
         </button>

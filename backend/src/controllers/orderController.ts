@@ -11,7 +11,7 @@ import {
 import { emptyCartDb, getCartIdByUserId } from "../database/cartDB";
 
 export const addOrder = async (req: Request, res: Response) => {
-  const { addressId, amount, paymentMethod } = req.body;
+  const { shippingAddress, totalAmount, paymentMethod } = req.body;
 
   try {
     const userId = req.user.id;
@@ -21,8 +21,8 @@ export const addOrder = async (req: Request, res: Response) => {
     const result = await addOrderDB(
       cartId,
       userId,
-      addressId,
-      amount,
+      shippingAddress,
+      totalAmount,
       paymentMethod,
       date
     );

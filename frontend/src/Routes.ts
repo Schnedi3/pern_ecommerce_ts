@@ -1,8 +1,4 @@
 // api
-import { addAddressRequest } from "./api/address";
-import { deleteAddressRequest } from "./api/address";
-import { getAddressRequest } from "./api/address";
-import { updateAddressRequest } from "./api/address";
 import { addToCartRequest } from "./api/cart";
 import { deleteFromCartRequest } from "./api/cart";
 import { getCartRequest } from "./api/cart";
@@ -13,10 +9,6 @@ import { createCheckoutSessionRequest } from "./api/payment";
 import { fetchCheckoutSessionRequest } from "./api/payment";
 
 export {
-  addAddressRequest,
-  deleteAddressRequest,
-  getAddressRequest,
-  updateAddressRequest,
   addToCartRequest,
   deleteFromCartRequest,
   getCartRequest,
