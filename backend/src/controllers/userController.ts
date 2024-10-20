@@ -43,10 +43,10 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const updateUsername = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { username } = req.body;
+  const { updatedUsername } = req.body;
 
   try {
-    const result = await updateUsernamerDB(username, id);
+    const result = await updateUsernamerDB(updatedUsername, id);
 
     res
       .status(200)

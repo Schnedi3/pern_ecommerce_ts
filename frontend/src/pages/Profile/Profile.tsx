@@ -3,13 +3,13 @@ import { toast } from "react-toastify";
 
 import { useAuthStore } from "../../store/authStore";
 import { useShopContext } from "../../context/useShopContext";
+import { useUpdateUsername } from "../../api/user";
 import {
   iconAddress,
   iconDelete,
   iconEdit,
   AddressModal,
   deleteAddressRequest,
-  updateUsernameRequest,
   Title,
 } from "../../Routes";
 import { AddressUpdate } from "./AddressUpdate";
@@ -24,7 +24,8 @@ export const Profile = () => {
     isModalAddress,
     setIsModalAddress,
   } = useShopContext();
-  const { user, authData } = useAuthStore();
+  const { user } = useAuthStore();
+  const { mutate: updateUsername } = useUpdateUsername();
 
   useEffect(() => {
     getAddress();
@@ -39,21 +40,9 @@ export const Profile = () => {
   ) => {
     e.preventDefault();
 
-    try {
-      if (updatedUsername.trim() !== "") {
-        const response = await updateUsernameRequest(updatedUsername, id);
-
-        if (response.data.success) {
-          toast.success(response.data.message);
-          authData(response.data.result);
-          localStorage.setItem("user", JSON.stringify(response.data.result));
-          setIsEditUsername(false);
-        } else {
-          toast.error(response.data.message);
-        }
-      }
-    } catch (error) {
-      console.error(error);
+    if (updatedUsername.trim() !== "") {
+      updateUsername({ updatedUsername, id });
+      setIsEditUsername(false);
     }
   };
 
