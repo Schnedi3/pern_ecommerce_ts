@@ -11,7 +11,6 @@ import { addOrderRequest } from "./api/order";
 import { addStripeOrderRequest } from "./api/order";
 import { createCheckoutSessionRequest } from "./api/payment";
 import { fetchCheckoutSessionRequest } from "./api/payment";
-import { updateUsernameRequest } from "./api/user";
 
 export {
   addAddressRequest,
@@ -26,7 +25,6 @@ export {
   addStripeOrderRequest,
   createCheckoutSessionRequest,
   fetchCheckoutSessionRequest,
-  updateUsernameRequest,
 };
 
 // components
