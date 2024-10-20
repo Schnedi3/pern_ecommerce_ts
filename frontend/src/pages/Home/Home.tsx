@@ -1,62 +1,41 @@
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import { useMemo, useState } from "react";
 
-import { getProductsRequest } from "../../Routes";
-import { IProduct } from "../../types/types";
+import { useProducts } from "../../api/product";
+import { ProductCard } from "./ProductCard";
 import { Search } from "./Search";
 import { Categories } from "./Categories";
 import { HomeSkeleton } from "../../skeletons/HomeSkeleton";
+import { IProduct } from "../../types/types";
 import styles from "./home.module.css";
 import "../globals.css";
-import { ProductCard } from "./ProductCard";
 
 export const defaultCategory: string = "All";
 
 export const Home = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedCategory, setSelectedCategory] =
     useState<string>(defaultCategory);
-
-  const getProducts = async () => {
-    try {
-      const response = await getProductsRequest();
-
-      if (response.data.success) {
-        setProducts(response.data.result);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    }
-  };
-
-  useEffect(() => {
-    getProducts();
-  }, []);
+  const { data: products, error, isLoading } = useProducts();
 
   const filteredProducts = useMemo(() => {
     let filtered = products;
 
     if (selectedCategory !== defaultCategory) {
       filtered = filtered.filter(
-        (product) => product.category === selectedCategory
+        (product: IProduct) => product.category === selectedCategory
       );
     }
 
     if (inputValue) {
-      filtered = filtered.filter((product) =>
+      filtered = filtered.filter((product: IProduct) =>
         product.title.toLowerCase().includes(inputValue.toLowerCase())
       );
     }
 
     return filtered;
   }, [selectedCategory, products, inputValue]);
+
+  if (!products || error || isLoading) return <HomeSkeleton />;
 
   return (
     <section className={styles.home}>
@@ -69,11 +48,7 @@ export const Home = () => {
         />
       </header>
 
-      {filteredProducts.length !== 0 ? (
-        <ProductCard filteredProducts={filteredProducts} />
-      ) : (
-        <HomeSkeleton />
-      )}
+      <ProductCard filteredProducts={filteredProducts} />
     </section>
   );
 };
