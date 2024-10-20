@@ -1,16 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 
 import { useAuthStore } from "../../store/authStore";
 import { useShopContext } from "../../context/useShopContext";
-import {
-  addToCartRequest,
-  getProductRequest,
-  iconNext,
-  iconPrevious,
-} from "../../Routes";
+import { useProduct } from "../../api/product";
+import { addToCartRequest, iconNext, iconPrevious } from "../../Routes";
 import { DetailSkeleton } from "../../skeletons/DetailSkeleton";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import { IProduct } from "../../types/types";
@@ -18,44 +14,12 @@ import { imagesURL } from "../config";
 import styles from "./detail.module.css";
 
 export const Detail = () => {
-  const [product, setProduct] = useState<IProduct | undefined>(undefined);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [currentImage, setCurrentImage] = useState(0);
-  const { id } = useParams<string>();
   const { cart, setCart, getCart } = useShopContext();
   const { isAuthenticated } = useAuthStore();
-
-  useEffect(() => {
-    const getProduct = async () => {
-      try {
-        if (id) {
-          const response = await getProductRequest(parseInt(id));
-
-          if (response.data.success) {
-            setProduct(response.data.result);
-          } else {
-            toast.error(response.data.message);
-          }
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.log(error.message);
-        } else {
-          console.log("An unexpected error occurred");
-        }
-      }
-    };
-
-    getProduct();
-  }, [id]);
-
-  const handlePrevious = () => {
-    setCurrentImage(currentImage === 0 ? images.length - 1 : currentImage - 1);
-  };
-
-  const handleNext = () => {
-    setCurrentImage(currentImage === images.length - 1 ? 0 : currentImage + 1);
-  };
+  const { id } = useParams();
+  const { data: product, error, isLoading } = useProduct(Number(id));
 
   const addToCart = async (
     product: IProduct,
@@ -89,8 +53,12 @@ export const Detail = () => {
     }
   };
 
-  if (!product) return <DetailSkeleton />;
-  const { title, description, price, sizes, images } = product;
+  const handlePrevious = () => {
+    setCurrentImage(currentImage === 0 ? images.length - 1 : currentImage - 1);
+  };
+  const handleNext = () => {
+    setCurrentImage(currentImage === images.length - 1 ? 0 : currentImage + 1);
+  };
 
   const isSizeInCart = (size: string) => {
     return cart.some(
@@ -101,6 +69,9 @@ export const Detail = () => {
   const handleSize = (size: string) => {
     setSelectedSize(selectedSize === size ? "" : size);
   };
+
+  if (!product || error || isLoading) return <DetailSkeleton />;
+  const { title, description, price, sizes, images } = product;
 
   const variants = {
     initial: { scale: 0.5 },
@@ -138,7 +109,7 @@ export const Detail = () => {
         <h4 className={styles.price}>{formatCurrency(price)}</h4>
         <p className={styles.desc}>{description}</p>
         <ul className={styles.sizes}>
-          {sizes.map((size) => (
+          {sizes.map((size: string) => (
             <li key={size}>
               <button
                 className={`${styles.size} ${
