@@ -1,19 +1,19 @@
 import { pool } from "./db";
 
-export const addOrderDB = async (
-  cartId: string,
+export const addCodOrderDB = async (
+  cartId: number,
   userId: number,
   addressId: number,
   amount: number,
   paymentMethod: string,
   date: Date
 ) => {
-  const addOrderQuery = `
+  const addCodOrderQuery = `
     INSERT INTO "order" (user_id, address_id, amount, payment_method, date)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *`;
 
-  const { rows: result } = await pool.query(addOrderQuery, [
+  const { rows: result } = await pool.query(addCodOrderQuery, [
     userId,
     addressId,
     amount,
@@ -33,7 +33,7 @@ export const addOrderDB = async (
 };
 
 export const addStripeOrderDB = async (
-  cartId: string,
+  cartId: number,
   userId: number,
   addressId: number,
   amount: number,

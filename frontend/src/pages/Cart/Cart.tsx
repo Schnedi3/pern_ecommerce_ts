@@ -117,7 +117,7 @@ export const Cart = () => {
         </div>
         <button
           className="dark_button"
-          onClick={() => navigate("/order-summary")}
+          onClick={() => navigate("/checkout")}
         >
           proceed to summary
         </button>

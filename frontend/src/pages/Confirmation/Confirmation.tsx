@@ -1,59 +1,30 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
-import {
-  addStripeOrderRequest,
-  fetchCheckoutSessionRequest,
-  iconConfirm,
-  Title,
-} from "../../Routes";
+import { useFetchCheckoutSession } from "../../api/payment";
+import { useStripeOrder } from "../../api/order";
+import { iconConfirm, Title } from "../../Routes";
 import styles from "./confirmation.module.css";
 
 export const Confirmation = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const sessionId = new URLSearchParams(location.search).get("session_id");
-
-  console.log("sessionId from confirmation", sessionId);
+  const { data: session } = useFetchCheckoutSession(String(sessionId));
+  const { mutate: addStripeOrder } = useStripeOrder();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const getSessionDetails = async () => {
-      if (!sessionId) {
-        toast.error("No session ID found. Redirecting");
-        navigate("/cart");
-        return;
-      }
-
-      try {
-        const response = await fetchCheckoutSessionRequest(sessionId);
-
-        if (response.data.payment_status === "paid") {
-          const { addressId, amount, paymentMethod } = response.data.metadata;
-          const res = await addStripeOrderRequest(
-            addressId,
-            amount,
-            paymentMethod,
-            sessionId
-          );
-
-          if (!res.data.success) {
-            toast.error(res.data.message);
-            navigate("/cart");
-          }
-        } else {
-          toast.error("Payment failed. Please try again");
-          navigate("/cart");
-        }
-      } catch (error) {
-        console.error("Error fetching checkout session:", error);
-        toast.error("Failed to retrieve payment session. Redirecting");
-        navigate("/cart");
-      }
-    };
-
-    getSessionDetails();
-  }, [sessionId, navigate]);
+    if (session?.payment_status === "paid") {
+      const { shippingAddress, totalAmount, paymentMethod } = session.metadata;
+      const { id: sessionId } = session;
+      addStripeOrder({
+        shippingAddress,
+        totalAmount,
+        paymentMethod,
+        sessionId,
+      });
+    }
+  }, [addStripeOrder, session]);
 
   return (
     <section className={styles.confirm}>

@@ -17,7 +17,7 @@ import {
   Login,
   NotFound,
   Orders,
-  OrderSummary,
+  Checkout,
   Profile,
   Register,
   ResetPassword,
@@ -35,7 +35,7 @@ const router = createBrowserRouter(
       <Route path="register" element={<Register />} />
       <Route path="reset-password" element={<ResetPassword />} />
       <Route path="cart" element={<Cart />} />
-      <Route path="order-summary" element={<OrderSummary />} />
+      <Route path="checkout" element={<Checkout />} />
       <Route path="orders" element={<Orders />} />
       <Route path="profile" element={<Profile />} />
       <Route path="confirmation" element={<Confirmation />} />

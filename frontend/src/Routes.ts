@@ -1,16 +1,3 @@
-// api
-import { addOrderRequest } from "./api/order";
-import { addStripeOrderRequest } from "./api/order";
-import { createCheckoutSessionRequest } from "./api/payment";
-import { fetchCheckoutSessionRequest } from "./api/payment";
-
-export {
-  addOrderRequest,
-  addStripeOrderRequest,
-  createCheckoutSessionRequest,
-  fetchCheckoutSessionRequest,
-};
-
 // components
 import { AddressModal } from "./components/AddressModal/AddressModal";
 import { Button } from "./components/Button/Button";
@@ -68,7 +55,7 @@ import { Home } from "./pages/Home/Home";
 import { Login } from "./pages/Auth/Login";
 import { NotFound } from "./pages/NotFound/NotFound";
 import { Orders } from "./pages/Orders/Orders";
-import { OrderSummary } from "./pages/OrderSummary/OrderSummary";
+import { Checkout } from "./pages/Checkout/Checkout";
 import { Profile } from "./pages/Profile/Profile";
 import { Register } from "./pages/Auth/Register";
 import { ResetPassword } from "./pages/Auth/ResetPassword";
@@ -83,7 +70,7 @@ export {
   Login,
   NotFound,
   Orders,
-  OrderSummary,
+  Checkout,
   Profile,
   Register,
   ResetPassword,
