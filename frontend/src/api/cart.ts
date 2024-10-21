@@ -2,14 +2,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 import axios from "./axios";
+import { useAuthStore } from "../store/authStore";
 
 export const useCart = () => {
+  const { isAuthenticated } = useAuthStore();
+
   return useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
       const { data } = await axios.get("/cart");
       return data.result;
     },
+    enabled: isAuthenticated,
   });
 };
 
