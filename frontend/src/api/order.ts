@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 import axios from "./axios";
@@ -14,6 +14,7 @@ export const useOrders = () => {
 };
 
 export const useCodOrder = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   return useMutation({
@@ -33,12 +34,14 @@ export const useCodOrder = () => {
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
       navigate("/success");
     },
   });
 };
 
 export const useStripeOrder = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   return useMutation({
@@ -59,6 +62,9 @@ export const useStripeOrder = () => {
         paymentMethod,
         sessionId,
       });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
     onError: () => {
       navigate("/cart");
