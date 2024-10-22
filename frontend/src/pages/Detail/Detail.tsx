@@ -40,17 +40,20 @@ export const Detail = () => {
     setCurrentImage(currentImage === images.length - 1 ? 0 : currentImage + 1);
   };
 
+  const handleSize = (size: string) => {
+    setSelectedSize(selectedSize === size ? "" : size);
+  };
+
   const isSizeInCart = (size: string) => {
     return cart?.some(
       (item: ICartItem) => item.product_id === product.id && item.size === size
     );
   };
 
-  const handleSize = (size: string) => {
-    setSelectedSize(selectedSize === size ? "" : size);
-  };
+  if (!product || error || isLoading) {
+    return <DetailSkeleton />;
+  }
 
-  if (!product || error || isLoading) return <DetailSkeleton />;
   const { title, description, price, sizes, images } = product;
 
   const variants = {

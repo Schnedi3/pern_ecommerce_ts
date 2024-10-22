@@ -8,8 +8,9 @@ import {
 } from "../../api/cart";
 import { ICartItem } from "../../types/types";
 import { formatCurrency } from "../../helpers/formatCurrency";
-import { iconCart, iconDelete, Title } from "../../Routes";
+import { iconDelete, Title } from "../../Routes";
 import { imagesURL } from "../config";
+import { CartSkeleton } from "../../skeletons/CartSkeleton";
 import styles from "./cart.module.css";
 
 export const Cart = () => {
@@ -36,30 +37,8 @@ export const Cart = () => {
     0
   );
 
-  if (!isAuthenticated || !cart || error || isLoading) {
-    return (
-      <section className={styles.empty}>
-        <img
-          className={styles.emptyIcon}
-          src={iconCart}
-          alt="empty cart icon"
-        />
-        <p className={styles.emptyText}>No data available</p>
-      </section>
-    );
-  }
-
-  if (cart.length === 0) {
-    return (
-      <section className={styles.empty}>
-        <img
-          className={styles.emptyIcon}
-          src={iconCart}
-          alt="empty cart icon"
-        />
-        <p className={styles.emptyText}>Your cart is empty</p>
-      </section>
-    );
+  if (!isAuthenticated || !cart || cart.length === 0 || error || isLoading) {
+    return <CartSkeleton />;
   }
 
   return (
@@ -115,10 +94,7 @@ export const Cart = () => {
             Total <span>{formatCurrency(totalAmount)}</span>
           </h3>
         </div>
-        <button
-          className="dark_button"
-          onClick={() => navigate("/checkout")}
-        >
+        <button className="dark_button" onClick={() => navigate("/checkout")}>
           proceed to summary
         </button>
       </article>

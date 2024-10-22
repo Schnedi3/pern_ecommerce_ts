@@ -1,20 +1,16 @@
 import { useOrders } from "../../api/order";
-import { iconBox, Title } from "../../Routes";
+import { Title } from "../../Routes";
 import { formatCurrency } from "../../helpers/formatCurrency";
 import { IOrder } from "../../types/types";
 import { imagesURL } from "../config";
+import { OrderSkeleton } from "../../skeletons/OrderSkeleton";
 import styles from "./orders.module.css";
 
 export const Orders = () => {
   const { data: orders, error, isLoading } = useOrders();
 
-  if (!orders || orders.length === 0 || error || isLoading) {
-    return (
-      <section className={styles.empty}>
-        <img className={styles.emptyIcon} src={iconBox} alt="icon box" />
-        <p className={styles.emptyText}>No data available</p>
-      </section>
-    );
+  if (!orders || orders?.length === 0 || error || isLoading) {
+    return <OrderSkeleton />;
   }
 
   return (

@@ -1,0 +1,111 @@
+/* ORDERS */
+.orderSkeleton {
+  min-height: calc(100vh - var(--menu-height) - var(--footer-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.orderSkeleton > h2 {
+  width: 10rem;
+  height: 2rem;
+  border-radius: 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.orderSkeleton > li {
+  display: flex;
+  flex-direction: column;
+}
+
+.orderSkeleton > li > article {
+  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  border-bottom: 0.05rem solid var(--gray-bg);
+}
+
+.orderSkeleton > li > article > img {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.4rem;
+  background-color: rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0);
+}
+
+.orderSkeleton > li > article > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.orderSkeleton > li > article > div > h3 {
+  width: 100%;
+  height: 1.3rem;
+  border-radius: 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.orderSkeleton > li > article > div > div {
+  display: flex;
+  gap: 1rem;
+}
+
+.orderSkeleton > li > article > div > div > p {
+  width: 7rem;
+  height: 1rem;
+  border-radius: 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.orderSkeleton > li > article > div > p {
+  width: 100%;
+  height: 1rem;
+  border-radius: 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.orderSkeleton > li > article > p {
+  width: 7rem;
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  border-radius: 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ADAPTIVE */
+@media (max-width: 700px) {
+  .orderSkeleton > li > article {
+    display: grid;
+    grid-template-columns: 0.5fr 2fr;
+    gap: 0;
+    column-gap: 2rem;
+  }
+
+  .orderSkeleton > li > article > img {
+    width: 5rem;
+    grid-row: span 2;
+  }
+
+  .orderSkeleton > li > article > p {
+    grid-column: 2;
+    margin: 0.5rem 0;
+  }
+}
+
+/* ANIMATION */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
