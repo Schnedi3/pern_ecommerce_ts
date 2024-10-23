@@ -83,14 +83,17 @@
 @media (max-width: 700px) {
   .orderSkeleton > li > article {
     display: grid;
-    grid-template-columns: 0.5fr 2fr;
-    gap: 0;
+    grid-template-columns: 0.5fr 1fr;
+    gap: 0.3rem;
     column-gap: 2rem;
   }
 
   .orderSkeleton > li > article > img {
-    width: 5rem;
     grid-row: span 2;
+  }
+
+  .orderSkeleton > li > article > div {
+    width: 90%;
   }
 
   .orderSkeleton > li > article > p {

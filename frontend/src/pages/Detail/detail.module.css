@@ -9,8 +9,10 @@
 
 .images {
   width: 100%;
+  height: 90%;
   position: relative;
   overflow: hidden;
+  display: flex;
 }
 
 .span {
@@ -128,11 +130,6 @@
 
   .images {
     height: 50vh;
-  }
-
-  .image {
-    width: 100%;
-    border-radius: 0;
   }
 
   .darkButtonDetail {

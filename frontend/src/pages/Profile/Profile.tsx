@@ -86,59 +86,63 @@ export const Profile = () => {
       <article>
         <Title title="Your addresses" />
 
-        <div className={styles.addresses}>
-          {addressList?.map((address: IAddress) => (
-            <div className={styles.label} key={address.first_name}>
-              <div>
-                <h4 className={styles.name}>
-                  {address.first_name} {address.last_name}
-                </h4>
+        {addressList?.length !== 0 ? (
+          <div className={styles.addresses}>
+            {addressList?.map((address: IAddress) => (
+              <div className={styles.label} key={address.first_name}>
+                <div>
+                  <h4 className={styles.name}>
+                    {address.first_name} {address.last_name}
+                  </h4>
 
-                <p>
-                  {address.street}, {address.number}
-                </p>
-                <p>{address.door}</p>
-                <p>{address.city}</p>
-                <p>
-                  {address.state}, {address.zip_code}
-                </p>
+                  <p>
+                    {address.street}, {address.number}
+                  </p>
+                  <p>{address.door}</p>
+                  <p>{address.city}</p>
+                  <p>
+                    {address.state}, {address.zip_code}
+                  </p>
 
-                <p>
-                  <span className={styles.span}>Phone number:</span>{" "}
-                  {address.phone}
-                </p>
+                  <p>
+                    <span className={styles.span}>Phone number:</span>{" "}
+                    {address.phone}
+                  </p>
+                </div>
+
+                <div className={styles.buttons}>
+                  <button
+                    className={styles.button}
+                    onClick={() => handleUpdateAddress(address)}
+                  >
+                    <img
+                      className={styles.buttonIcon}
+                      src={iconEdit}
+                      alt="edit address"
+                    />
+                  </button>
+                  <button
+                    className={styles.button}
+                    onClick={() => deleteAddress(address.id)}
+                  >
+                    <img
+                      className={styles.buttonIcon}
+                      src={iconDelete}
+                      alt="delete address"
+                    />
+                  </button>
+                </div>
               </div>
-
-              <div className={styles.buttons}>
-                <button
-                  className={styles.button}
-                  onClick={() => handleUpdateAddress(address)}
-                >
-                  <img
-                    className={styles.buttonIcon}
-                    src={iconEdit}
-                    alt="edit address"
-                  />
-                </button>
-                <button
-                  className={styles.button}
-                  onClick={() => deleteAddress(address.id)}
-                >
-                  <img
-                    className={styles.buttonIcon}
-                    src={iconDelete}
-                    alt="delete address"
-                  />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p>You haven't add any address yet</p>
+        )}
       </article>
 
       <button
         className={styles.addAddress}
-        onClick={() => setIsEditAddress(true)}
+        onClick={() => setIsAddAddress(true)}
       >
         <img
           className={styles.addAddressIcon}

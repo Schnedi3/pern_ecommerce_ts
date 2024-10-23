@@ -32,6 +32,16 @@ export const Categories = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
+
   return (
     <article className={styles.categories}>
       <button className={styles.toggleModal} onClick={toggleModal}>

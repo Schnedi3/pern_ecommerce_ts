@@ -41,7 +41,7 @@
 }
 
 .productSkeleton > input {
-  width: 80%;
+  width: 5rem;
   padding: 0.3rem 0.3rem 0.3rem 0.5rem;
   border: 0.1rem solid var(--gray-bg);
   border-radius: 0.4rem;
