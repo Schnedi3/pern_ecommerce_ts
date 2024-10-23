@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useFetchCheckoutSession } from "../../api/payment";
-import { useStripeOrder } from "../../api/order";
+import { useAddOrder } from "../../api/order";
 import { iconConfirm, Title } from "../../Routes";
 import styles from "./confirmation.module.css";
 
@@ -10,21 +10,20 @@ export const Confirmation = () => {
   const location = useLocation();
   const sessionId = new URLSearchParams(location.search).get("session_id");
   const { data: session } = useFetchCheckoutSession(String(sessionId));
-  const { mutate: addStripeOrder } = useStripeOrder();
+  const { mutate: addOrder } = useAddOrder();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (session?.payment_status === "paid") {
+    if (sessionId && session?.payment_status === "paid") {
       const { shippingAddress, totalAmount, paymentMethod } = session.metadata;
-      const { id: sessionId } = session;
-      addStripeOrder({
+      addOrder({
         shippingAddress,
         totalAmount,
         paymentMethod,
         sessionId,
       });
     }
-  }, [addStripeOrder, session]);
+  }, [addOrder, sessionId, session]);
 
   return (
     <section className={styles.confirm}>

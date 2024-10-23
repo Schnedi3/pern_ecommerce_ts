@@ -1,38 +1,6 @@
 import { pool } from "./db";
 
-export const addCodOrderDB = async (
-  cartId: number,
-  userId: number,
-  addressId: number,
-  amount: number,
-  paymentMethod: string,
-  date: Date
-) => {
-  const addCodOrderQuery = `
-    INSERT INTO "order" (user_id, address_id, amount, payment_method, date)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING *`;
-
-  const { rows: result } = await pool.query(addCodOrderQuery, [
-    userId,
-    addressId,
-    amount,
-    paymentMethod,
-    date,
-  ]);
-
-  const addOrderItemQuery = `
-    INSERT INTO order_item (order_id, product_id, quantity, size)
-    SELECT $1, product_id, quantity, size
-    FROM cart_item
-    WHERE cart_id = $2
-    RETURNING *`;
-
-  await pool.query(addOrderItemQuery, [result[0].id, cartId]);
-  return result[0];
-};
-
-export const addStripeOrderDB = async (
+export const addOrderDB = async (
   cartId: number,
   userId: number,
   addressId: number,
@@ -43,8 +11,7 @@ export const addStripeOrderDB = async (
 ) => {
   const checkSessionQuery = `
     SELECT id FROM "order"
-    WHERE session_id = $1
-  `;
+    WHERE session_id = $1`;
 
   const { rows: existingOrder } = await pool.query(checkSessionQuery, [
     sessionId,
@@ -54,12 +21,12 @@ export const addStripeOrderDB = async (
     return existingOrder[0];
   }
 
-  const addStripeOrderQuery = `
+  const addOrderQuery = `
     INSERT INTO "order" (user_id, address_id, amount, payment_method, date, session_id)
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *`;
 
-  const { rows: result } = await pool.query(addStripeOrderQuery, [
+  const { rows: result } = await pool.query(addOrderQuery, [
     userId,
     addressId,
     amount,

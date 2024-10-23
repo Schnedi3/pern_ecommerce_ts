@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 
 import axios from "./axios";
+import { useNavigate } from "react-router-dom";
 
 export const useOrders = () => {
   return useQuery({
@@ -13,34 +13,7 @@ export const useOrders = () => {
   });
 };
 
-export const useCodOrder = () => {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  return useMutation({
-    mutationFn: ({
-      shippingAddress,
-      totalAmount,
-      paymentMethod,
-    }: {
-      shippingAddress: number;
-      totalAmount: number;
-      paymentMethod: string;
-    }) => {
-      return axios.post("/order", {
-        shippingAddress,
-        totalAmount,
-        paymentMethod,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-      navigate("/success");
-    },
-  });
-};
-
-export const useStripeOrder = () => {
+export const useAddOrder = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -54,20 +27,21 @@ export const useStripeOrder = () => {
       shippingAddress: number;
       totalAmount: number;
       paymentMethod: string;
-      sessionId: string;
+      sessionId: string | null;
     }) => {
-      return axios.post("/order/stripe", {
+      return axios.post("/order", {
         shippingAddress,
         totalAmount,
         paymentMethod,
         sessionId,
       });
     },
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
+      if (!data.result.session_id) {
+        navigate("/success");
+      }
+
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-    },
-    onError: () => {
-      navigate("/cart");
     },
   });
 };

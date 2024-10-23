@@ -62,5 +62,6 @@ CREATE TABLE "order" (
   amount INTEGER NOT NULL,
   payment_method VARCHAR(25) NOT NULL,
   status VARCHAR(100) DEFAULT 'Order placed',
-  date TIMESTAMP
+  date TIMESTAMP,
+  session_id VARCHAR(255)
 );

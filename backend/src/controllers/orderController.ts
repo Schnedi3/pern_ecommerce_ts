@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 
 import {
-  addCodOrderDB,
-  addStripeOrderDB,
+  addOrderDB,
   getOrdersDB,
   getUserOrdersDB,
   updateStatusDB,
@@ -11,32 +10,6 @@ import {
 import { emptyCartDb, getCartIdByUserId } from "../database/cartDB";
 
 export const addOrder = async (req: Request, res: Response) => {
-  const { shippingAddress, totalAmount, paymentMethod } = req.body;
-
-  try {
-    const userId = req.user.id;
-    const cartId = await getCartIdByUserId(userId);
-    const date = new Date();
-
-    const result = await addCodOrderDB(
-      cartId,
-      userId,
-      shippingAddress,
-      totalAmount,
-      paymentMethod,
-      date
-    );
-
-    // empty cart
-    await emptyCartDb(cartId);
-
-    res.status(200).json({ success: true, message: "Order placed", result });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const addStripeOrder = async (req: Request, res: Response) => {
   const { shippingAddress, totalAmount, paymentMethod, sessionId } = req.body;
 
   try {
@@ -44,7 +17,7 @@ export const addStripeOrder = async (req: Request, res: Response) => {
     const cartId = await getCartIdByUserId(userId);
     const date = new Date();
 
-    const result = await addStripeOrderDB(
+    const result = await addOrderDB(
       cartId,
       userId,
       shippingAddress,
