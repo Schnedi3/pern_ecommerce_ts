@@ -44,19 +44,21 @@ export const Checkout = () => {
     <section className={styles.order}>
       <article className={styles.cart}>
         <Title title="Summary" />
-        {cart.map((product: ICartItem) => (
-          <div className={styles.product} key={product.product_id}>
-            <img
-              className={styles.productImage}
-              src={`${imagesURL}/${product.images[0]}`}
-              alt={product.title}
-            />
-            <h3>{product.title}</h3>
-            <p>{product.quantity}</p>
-            <p>{product.size}</p>
-            <p>{formatCurrency(product.price)}</p>
-          </div>
-        ))}
+        {cart.map(
+          ({ images, price, product_id, quantity, size, title }: ICartItem) => (
+            <div className={styles.product} key={product_id}>
+              <img
+                className={styles.productImage}
+                src={`${imagesURL}/${images[0]}`}
+                alt={title}
+              />
+              <h3>{title}</h3>
+              <p>{quantity}</p>
+              <p>{size}</p>
+              <p>{formatCurrency(price)}</p>
+            </div>
+          )
+        )}
 
         <div className={styles.total}>
           <p className={styles.shipping}>

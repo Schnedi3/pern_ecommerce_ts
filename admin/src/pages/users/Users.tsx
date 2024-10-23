@@ -20,17 +20,17 @@ export const Users = () => {
     <section className={styles.users}>
       <Title title="Users" />
       <ul className={styles.usersList}>
-        {users.map((user: IUser) => (
-          <li className={styles.user} key={user.id}>
-            <h3>{user.id}</h3>
-            <h3>{user.username}</h3>
-            <h4>{user.email}</h4>
-            <p>{user.role}</p>
+        {users.map(({ id, username, email, role }: IUser) => (
+          <li className={styles.user} key={id}>
+            <h3>{id}</h3>
+            <h3>{username}</h3>
+            <h4>{email}</h4>
+            <p>{role}</p>
             <img
               className={styles.userDelete}
               src={iconDelete}
               alt="remove product"
-              onClick={() => deleteUser(user.id)}
+              onClick={() => deleteUser(id)}
             />
           </li>
         ))}

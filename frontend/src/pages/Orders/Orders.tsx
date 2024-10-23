@@ -17,40 +17,41 @@ export const Orders = () => {
     <ul className={styles.orders}>
       <Title title="All orders" />
 
-      {orders.map((order: IOrder) => (
-        <li className={styles.order} key={order.order_id}>
-          {order.products.map((item) => (
-            <article className={styles.product} key={item.id}>
-              <img
-                className={styles.productImage}
-                src={`${imagesURL}/${item.images[0]}`}
-                alt=""
-              />
+      {orders.map(
+        ({ order_date, order_id, order_status, products }: IOrder) => (
+          <li className={styles.order} key={order_id}>
+            {products.map(({ id, images, price, quantity, size, title }) => (
+              <article className={styles.product} key={id}>
+                <img
+                  className={styles.productImage}
+                  src={`${imagesURL}/${images[0]}`}
+                  alt=""
+                />
 
-              <div className={styles.productInfo}>
-                <h3>{item.title}</h3>
-                <div>
-                  <p>{formatCurrency(item.price)}</p>
+                <div className={styles.productInfo}>
+                  <h3>{title}</h3>
+                  <div>
+                    <p>{formatCurrency(price)}</p>
+                    <p>
+                      <span className={styles.span}>Quantity:</span> {quantity}
+                    </p>
+                    <p>
+                      <span className={styles.span}>Size:</span> {size}
+                    </p>
+                  </div>
+
                   <p>
-                    <span className={styles.span}>Quantity:</span>{" "}
-                    {item.quantity}
-                  </p>
-                  <p>
-                    <span className={styles.span}>Size:</span> {item.size}
+                    <span className={styles.span}>Date:</span>{" "}
+                    {new Date(order_date).toLocaleString()}
                   </p>
                 </div>
 
-                <p>
-                  <span className={styles.span}>Date:</span>{" "}
-                  {new Date(order.order_date).toLocaleString()}
-                </p>
-              </div>
-
-              <p className={styles.status}>{order.order_status}</p>
-            </article>
-          ))}
-        </li>
-      ))}
+                <p className={styles.status}>{order_status}</p>
+              </article>
+            ))}
+          </li>
+        )
+      )}
     </ul>
   );
 };

@@ -22,20 +22,20 @@ export const Products = () => {
     <section className={styles.products}>
       <Title title="Products" />
       <ul className={styles.product}>
-        {products.map((product: IProduct) => (
-          <li className={styles.singleProduct} key={product.id}>
+        {products.map(({ id, images, title, category, price }: IProduct) => (
+          <li className={styles.singleProduct} key={id}>
             <img
               className={styles.productImage}
-              src={`${imagesURL}/${product.images[0]}`}
+              src={`${imagesURL}/${images[0]}`}
             />
-            <h3>{product.title}</h3>
-            <h4>{product.category}</h4>
-            <p>{formatCurrency(product.price)}</p>
+            <h3>{title}</h3>
+            <h4>{category}</h4>
+            <p>{formatCurrency(price)}</p>
             <img
               className={styles.productDelete}
               src={iconDelete}
               alt="remove product"
-              onClick={() => deleteProduct(product.id)}
+              onClick={() => deleteProduct(id)}
             />
           </li>
         ))}

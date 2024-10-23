@@ -46,42 +46,40 @@ export const Cart = () => {
       <article>
         <Title title="Cart" />
 
-        {cart.map((product: ICartItem) => (
-          <div className={styles.product} key={product.product_id}>
-            <img
-              className={styles.productImage}
-              src={`${imagesURL}/${product.images[0]}`}
-              alt={product.title}
-            />
-            <h3 className={styles.productTitle}>{product.title}</h3>
-            <input
-              className={styles.input}
-              type="number"
-              id="quantity"
-              min={1}
-              defaultValue={product.quantity}
-              onChange={(e) =>
-                handleUpdateProductQuantity(
-                  product.product_id,
-                  Number(e.target.value),
-                  product.size
-                )
-              }
-            />
-            <p className={styles.productText}>{product.size}</p>
-            <p className={styles.productText}>
-              {formatCurrency(product.price)}
-            </p>
-            <img
-              className={styles.delete}
-              src={iconDelete}
-              alt="delete product"
-              onClick={() =>
-                handleDeleteFromCart(product.product_id, product.size)
-              }
-            />
-          </div>
-        ))}
+        {cart.map(
+          ({ images, price, product_id, quantity, size, title }: ICartItem) => (
+            <div className={styles.product} key={product_id}>
+              <img
+                className={styles.productImage}
+                src={`${imagesURL}/${images[0]}`}
+                alt={title}
+              />
+              <h3 className={styles.productTitle}>{title}</h3>
+              <input
+                className={styles.input}
+                type="number"
+                id="quantity"
+                min={1}
+                defaultValue={quantity}
+                onChange={(e) =>
+                  handleUpdateProductQuantity(
+                    product_id,
+                    Number(e.target.value),
+                    size
+                  )
+                }
+              />
+              <p className={styles.productText}>{size}</p>
+              <p className={styles.productText}>{formatCurrency(price)}</p>
+              <img
+                className={styles.delete}
+                src={iconDelete}
+                alt="delete product"
+                onClick={() => handleDeleteFromCart(product_id, size)}
+              />
+            </div>
+          )
+        )}
       </article>
 
       <article className={styles.total}>
