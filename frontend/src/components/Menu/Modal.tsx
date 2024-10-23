@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
-import { useAuthStore } from "../../store/authStore";
 import { iconLogin } from "../../Routes";
 import styles from "./modal.module.css";
+import { useLogout } from "../../api/auth";
 
 export const Modal = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { logoutAuth } = useAuthStore();
-  const navigate = useNavigate();
+  const { mutate: logout } = useLogout();
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const closeModal = () => setIsModalOpen(false);
@@ -30,11 +28,6 @@ export const Modal = () => {
       document.body.style.overflow = "unset";
     };
   }, [isModalOpen]);
-
-  const logout = () => {
-    logoutAuth();
-    navigate("/");
-  };
 
   return (
     <section>
@@ -62,7 +55,7 @@ export const Modal = () => {
           </NavLink>
         </li>
         <li className={styles.modalItem}>
-          <p className={styles.modalItemText} onClick={logout}>
+          <p className={styles.modalItemText} onClick={() => logout()}>
             Logout
           </p>
         </li>
